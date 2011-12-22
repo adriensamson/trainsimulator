@@ -4,13 +4,34 @@
         <title>Train simulator</title>
         <script type="text/javascript" src="../src/trainsimulator.js"></script>
         <script type="text/javascript" src="../src/trainsimulatorui.js"></script>
+        <script type="text/javascript" src="../src/builder.js"></script>
     </head>
     <body>
         <h1>Train simulator TEST</h1>
         <canvas id="canvas" width="300" height="300"></canvas>
         <script type="text/javascript">
-var tsui = new TrainSimulatorUi(document.getElementById('canvas'));
+/var tsui = new TrainSimulatorUi(document.getElementById('canvas'));*/
 
+
+
+var schema = {
+    'origin': {x: 50, y: 50, angle: 0},
+    'pieces': [
+        {type: 'straight', length: 100, endPoint: 'sw1.1'},
+        {type: 'switch', name:'switch1', point1: 'sw1.1', point2: 'sw1.2', point3: 'sw1.3'},
+        {type: 'straight', length: 50, startPoint: 'sw1.2'},
+        {type: 'curve', radius: 50, length: 50 * Math.PI, clockWise: true},
+        {type: 'straight', length: 50, endPoint: 'sw2.2'},
+        {type: 'switch', name:'switch2', point1: 'sw2.1', point2: 'sw2.2', point3: 'sw2.3'},
+        {type: 'straight', length: 100, startPoint: 'sw2.1'},
+        {type: 'curve', radius: 50, length: 50 * Math.PI, clockWise: true, endPoint: 'origin'},
+        {type: 'curve', radius: 50, length: 50 * Math.PI, clockWise: true, startPoint: 'sw1.3', endPoint: 'sw2.3'}
+    ]
+};
+var builder = new TrainSimulatorBuilder(document.getElementById('canvas'));
+var tsui = builder.tsui;
+builder.build(schema);
+/*
 var track1 = tsui.newStraightTrack({x: 50, y:50 }, 0);
 var track2 = tsui.newCurveTrack({x: 200, y:100 }, 50, -Math.PI / 2, false);
 var track3 = tsui.newStraightTrack({x: 200, y:150 }, Math.PI);
@@ -32,7 +53,7 @@ joint3_4.connectTrack(2, track4, 0, -1);
 var joint4_1 = tsui.newJoint();
 joint4_1.connectTrack(1, track4, 50 * Math.PI, 1);
 joint4_1.connectTrack(2, track1, 0, -1);
-
+*/
 /*
 var joint1_5 = tsui.newJoint();
 joint1_5.connectTrack(1, track1, 100, 1);
@@ -42,7 +63,7 @@ var joint5_3 = tsui.newJoint();
 joint5_3.connectTrack(1, track5, 50 * Math.PI, 1);
 joint5_3.connectTrack(2, track3, 50, -1);
 */
-
+/*
 var switch1 = tsui.newSwitch();
 switch1.connectTrack(1, track1, 100, 1);
 switch1.connectTrack(2, track1, 100.001, -1);
@@ -52,16 +73,16 @@ var switch2 = tsui.newSwitch();
 switch2.connectTrack(1, track3, 51, -1);
 switch2.connectTrack(2, track3, 50.001, 1);
 switch2.connectTrack(3, track5, 50 * Math.PI, 1);
-
+*/
 var train = tsui.newTrain(20);
-train.putOnTrack(track1, 55, 1);
+train.putOnTrack(tsui.tracks[0], 55, 1);
 
 tsui.trainSimulator.sortElements();
 tsui.redraw();
 tsui.trainSimulator.sortElements();
 
 function move() {
-    train.move(1);
+    train.move(parseInt(document.getElementById('speed').value));
     tsui.trainSimulator.sortElements();
     tsui.redraw();
 };
@@ -78,7 +99,8 @@ function toggleMove() {
 
         </script>
         <button type="button" onclick="toggleMove()">GO / STOP</button>
-        <button type="button" onclick="switch1.toggle()">Switch 1</button>
+        <button type="button" onclick="builder.switches['switch1'].toggle()">Switch 1</button>
+        <button type="button" onclick="document.getElementById('speed').value = document.getElementById('speed').value - 1">Speed down</button><input type="text" id="speed" value="1" size="2" /><button type="button" onclick="document.getElementById('speed').value = parseInt(document.getElementById('speed').value) + 1">Speed up</button>
     </body>
 </html>
 

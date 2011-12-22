@@ -71,26 +71,31 @@ var TrainSimulatorUi = function(canvas) {
     
     this.drawJoints = function() {
         var i;
+        var ctx = canvas.getContext("2d");
+        ctx.strokeStyle = 'rgba(255, 0, 0, 0.6)';
+        ctx.lineWidth = 2;
         for (i = 0; i < this.joints.length; i++) {
-            /*
-            var j1 = document.getElementById('joint-'+i+'-1');
-            j1.style.left = this.joints[i].tracks[1].position + 'px';
-            var j2 = document.getElementById('joint-'+i+'-2');
-            j2.style.left = this.joints[i].tracks[2].position + 'px';
-            */
+            var jointTrack = this.joints[i].tracks[1];
+            jointTrack.track.draw(ctx, jointTrack.position, jointTrack.position - jointTrack.direction * 5);
+            
+            var jointTrack = this.joints[i].tracks[2];
+            jointTrack.track.draw(ctx, jointTrack.position, jointTrack.position - jointTrack.direction * 5);
+            
         }
     };
     this.drawSwitches = function() {
         var i;
+        var ctx = canvas.getContext("2d");
+        ctx.strokeStyle = 'rgba(255, 0, 0, 0.6)';
+        ctx.lineWidth = 2;
         for (i = 0; i < this.switches.length; i++) {
-            /*
-            var j1 = document.getElementById('switch-'+i+'-1');
-            j1.style.left = this.switches[i].tracks[1].position + 'px';
-            var j2 = document.getElementById('switch-'+i+'-2');
-            j2.style.left = this.switches[i].tracks[2].position + 'px';
-            var j3 = document.getElementById('switch-'+i+'-3');
-            j3.style.left = this.switches[i].tracks[3].position + 'px';
-            */
+            
+            var jointTrack = this.switches[i].tracks[1];
+            jointTrack.track.draw(ctx, jointTrack.position, jointTrack.position - jointTrack.direction * 15);
+            
+            var jointTrack = this.switches[i].tracks[this.switches[i].nextTrack(1)];
+            jointTrack.track.draw(ctx, jointTrack.position, jointTrack.position - jointTrack.direction * 15);
+            
         }
     };
     this.drawTrains = function() {
@@ -105,8 +110,6 @@ var TrainSimulatorUi = function(canvas) {
                 var part = parts[j];
                 part.track.draw(ctx, part.from, part.to);
             }
-            //var headTrack = train.elementHead.track;
-            //headTrack.draw(ctx, train.elementHead.x, train.elementTail.x);
         }
     };
     
@@ -114,6 +117,8 @@ var TrainSimulatorUi = function(canvas) {
         var ctx = canvas.getContext("2d");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         this.drawTracks();
+        //this.drawJoints();
+        this.drawSwitches();
         this.drawTrains();
     }
 }

@@ -8,7 +8,17 @@ var Utils = {
         return 0;
     },
     partitionEquals: function (part1, part2) {
-        return part1.removedTrack == part2.removedTrack && part1.removedPosition == part2.removedPosition && part1.addedTrack == part2.addedTrack && part1.addedPosition == part2.addedPosition
+        return (part1.removedTrack == part2.removedTrack && part1.removedPosition == part2.removedPosition
+                && part1.addedTrack == part2.addedTrack && part1.addedPosition == part2.addedPosition)
+            || (part1.removedTrack == part2.addedTrack && part1.removedPosition == part2.addedPosition
+                && part1.addedTrack == part2.removedTrack && part1.addedPosition == part2.removedPosition)
+    },
+    clone: function (object) {
+        var newObject = {};
+        for (prop in object) {
+            newObject[prop] = object[prop];
+        }
+        return newObject;
     }
 };
 
@@ -69,9 +79,11 @@ var Joint = function() {
                 if (direction > 0 && elm.x > this.x
                     || direction < 0 && elm.x < this.x
                 ) {
-                    var newTrack = joint.tracks[num == 1 ? 2 : 1];
-                    elm.x = newTrack.position + newTrack.direction * (this.x - elm.x);
-                    elm.direction *= -1 * joint.tracks[1].direction * joint.tracks[2].direction;
+                    var newTrackNum = num == 1 ? 2 : 1;
+                    var newTrack = joint.tracks[newTrackNum];
+                    var coeff = -1 * joint.tracks[num].direction * joint.tracks[newTrackNum].direction;
+                    elm.x = newTrack.position + coeff * (elm.x - this.x);
+                    elm.direction *= coeff;
                     track.removeElement(elm);
                     newTrack.track.addElement(elm, newTrack.position);
                     if (elm.addPartition) {
@@ -178,9 +190,17 @@ var Train = function(size) {
         var i;
         for (i = 0; i < this.trackPartitions.length; i++) {
             var partition = this.trackPartitions[i];
-            newPart.to = partition.removedPosition;
-            parts[parts.length] = newPart;
-            newPart = {track: partition.addedTrack, from: partition.addedPosition};
+            if (newPart.track == partition.removedTrack) {
+                newPart.to = partition.removedPosition;
+                parts[parts.length] = newPart;
+                newPart = {track: partition.addedTrack, from: partition.addedPosition};
+            } else if (newPart.track == partition.addedTrack) {
+                newPart.to = partition.addedPosition;
+                parts[parts.length] = newPart;
+                newPart = {track: partition.removedTrack, from: partition.removedPosition};
+            } else {
+                console.log('getTrackParts: no corresponding track');
+            }
         }
         newPart.to = this.elementHead.x;
         parts[parts.length] = newPart;
