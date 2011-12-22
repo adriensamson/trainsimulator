@@ -13,7 +13,7 @@ var TrainSimulatorBuilder = function (canvas) {
     };
     
     this.addCurvePiece = function (piece, currentPoint) {
-        var center, startAngle, endAngle, newTrack;
+        var center, startAngle, endAngle, futureCurrentAngle, newTrack;
         if (piece.clockWise) {
             center = {
                 x: currentPoint.x + piece.radius * Math.cos(currentPoint.angle + Math.PI/2),
@@ -21,18 +21,20 @@ var TrainSimulatorBuilder = function (canvas) {
             };
             startAngle = currentPoint.angle - Math.PI / 2;
             endAngle = startAngle + piece.length / piece.radius;
+            futureCurrentAngle = endAngle + Math.PI / 2;
         } else {
             center = {
-                x: currentPoint.x + piece.radius * Math.cos(currentPoint.angle + Math.PI/2),
-                y: currentPoint.y + piece.radius * Math.sin(currentPoint.angle + Math.PI/2)
+                x: currentPoint.x + piece.radius * Math.cos(currentPoint.angle - Math.PI/2),
+                y: currentPoint.y + piece.radius * Math.sin(currentPoint.angle - Math.PI/2)
             };
             startAngle = currentPoint.angle + Math.PI / 2;
             endAngle = startAngle - piece.length / piece.radius;
+            futureCurrentAngle = endAngle - Math.PI / 2;
         }
         newTrack = this.tsui.newCurveTrack(center, piece.radius, startAngle, !piece.clockWise);
         currentPoint.x = center.x + piece.radius * Math.cos(endAngle);
         currentPoint.y = center.y + piece.radius * Math.sin(endAngle);
-        currentPoint.angle = endAngle + Math.PI / 2;
+        currentPoint.angle = futureCurrentAngle;
         this.addTrackPiecePoints(piece, newTrack, currentPoint);
         return newTrack;
     };
@@ -42,7 +44,7 @@ var TrainSimulatorBuilder = function (canvas) {
             var inversedPoint = {
                 x: currentPoint.x,
                 y: currentPoint.y,
-                angle: currentPoint + Math.PI
+                angle: currentPoint.angle + Math.PI
             };
             this.addPoint(piece.startPoint, {
                 type: 'track',

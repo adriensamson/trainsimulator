@@ -25,16 +25,19 @@ var TrainSimulatorUi = function(canvas) {
         };
         return track;
     };
-    this.newCurveTrack = function(center, radius, originAngle, turnDirection) {
+    this.newCurveTrack = function(center, radius, originAngle, antiClockWise) {
         var track = this.newTrack();
         track.type = 'curve';
         track.center = center;
         track.radius = radius;
         track.originAngle = originAngle;
-        track.turnDirection = turnDirection;
+        track.antiClockWise = antiClockWise;
         track.draw = function(ctx, from, to) {
+            var drawAntiClockWise = (from < to ) ? this.antiClockWise : !this.antiClockWise;
+            var drawOriginAngle = this.originAngle + ((this.antiClockWise) ? -1 : 1) * from / this.radius;
+            var drawEndAngle = this.originAngle + ((this.antiClockWise) ? -1 : 1) * to / this.radius;
             ctx.beginPath();
-            ctx.arc(this.center.x, this.center.y, this.radius, this.originAngle + from / this.radius, this.originAngle + to / this.radius, this.turnDirection)
+            ctx.arc(this.center.x, this.center.y, this.radius, drawOriginAngle, drawEndAngle, drawAntiClockWise);
             ctx.stroke();
         };
         return track;

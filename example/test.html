@@ -15,67 +15,42 @@
 
 
 var schema = {
-    'origin': {x: 50, y: 50, angle: 0},
+    'origin': {x: 60, y: 10, angle: 0},
     'pieces': [
-        {type: 'straight', length: 100, endPoint: 'sw1.1'},
+        {type: 'straight', length: 40, endPoint: 'sw3.2'},
+
+        {type: 'switch', name:'switch3', point1: 'sw3.1', point2: 'sw3.2', point3: 'sw3.3'},
+
+        {type: 'straight', length: 70, startPoint: 'sw3.1', endPoint: 'sw1.1'},
+        
         {type: 'switch', name:'switch1', point1: 'sw1.1', point2: 'sw1.2', point3: 'sw1.3'},
-        {type: 'straight', length: 50, startPoint: 'sw1.2'},
+        
+        {type: 'straight', length: 40, startPoint: 'sw1.2'},
         {type: 'curve', radius: 50, length: 50 * Math.PI, clockWise: true},
-        {type: 'straight', length: 50, endPoint: 'sw2.2'},
+        {type: 'straight', length: 40, endPoint: 'sw2.1'},
+        
         {type: 'switch', name:'switch2', point1: 'sw2.1', point2: 'sw2.2', point3: 'sw2.3'},
-        {type: 'straight', length: 100, startPoint: 'sw2.1'},
+        
+        {type: 'straight', length: 70, startPoint: 'sw2.2', endPoint: 'sw4.2'},
+
+        {type: 'switch', name:'switch4', point1: 'sw4.1', point2: 'sw4.2', point3: 'sw4.3'},
+        
+        {type: 'straight', length: 40, startPoint: 'sw4.1'},
         {type: 'curve', radius: 50, length: 50 * Math.PI, clockWise: true, endPoint: 'origin'},
-        {type: 'curve', radius: 50, length: 50 * Math.PI, clockWise: true, startPoint: 'sw1.3', endPoint: 'sw2.3'}
+        
+        {type: 'curve', radius: 25, length: 25 * Math.PI, clockWise: true, startPoint: 'sw1.3'},
+        {type: 'curve', radius: 25, length: 25 * Math.PI, clockWise: false, endPoint: 'sw2.3'},
+        
+        {type: 'curve', radius: 25, length: 25 * Math.PI, clockWise: false, startPoint: 'sw3.3'},
+        {type: 'curve', radius: 25, length: 25 * Math.PI, clockWise: true, endPoint: 'sw4.3'}
     ]
 };
 var builder = new TrainSimulatorBuilder(document.getElementById('canvas'));
 var tsui = builder.tsui;
 builder.build(schema);
-/*
-var track1 = tsui.newStraightTrack({x: 50, y:50 }, 0);
-var track2 = tsui.newCurveTrack({x: 200, y:100 }, 50, -Math.PI / 2, false);
-var track3 = tsui.newStraightTrack({x: 200, y:150 }, Math.PI);
-var track4 = tsui.newCurveTrack({x: 50, y:100 }, 50, Math.PI / 2, false);
-var track5 = tsui.newCurveTrack({x: 150, y:100 }, 50, -Math.PI / 2, false);
 
-var joint1_2 = tsui.newJoint();
-joint1_2.connectTrack(1, track1, 150, 1);
-joint1_2.connectTrack(2, track2, 0, -1);
-
-var joint2_3 = tsui.newJoint();
-joint2_3.connectTrack(1, track2, 50 * Math.PI, 1);
-joint2_3.connectTrack(2, track3, 0, -1);
-
-var joint3_4 = tsui.newJoint();
-joint3_4.connectTrack(1, track3, 150, 1);
-joint3_4.connectTrack(2, track4, 0, -1);
-
-var joint4_1 = tsui.newJoint();
-joint4_1.connectTrack(1, track4, 50 * Math.PI, 1);
-joint4_1.connectTrack(2, track1, 0, -1);
-*/
-/*
-var joint1_5 = tsui.newJoint();
-joint1_5.connectTrack(1, track1, 100, 1);
-joint1_5.connectTrack(2, track5, 0, -1);
-
-var joint5_3 = tsui.newJoint();
-joint5_3.connectTrack(1, track5, 50 * Math.PI, 1);
-joint5_3.connectTrack(2, track3, 50, -1);
-*/
-/*
-var switch1 = tsui.newSwitch();
-switch1.connectTrack(1, track1, 100, 1);
-switch1.connectTrack(2, track1, 100.001, -1);
-switch1.connectTrack(3, track5, 0, -1);
-
-var switch2 = tsui.newSwitch();
-switch2.connectTrack(1, track3, 51, -1);
-switch2.connectTrack(2, track3, 50.001, 1);
-switch2.connectTrack(3, track5, 50 * Math.PI, 1);
-*/
 var train = tsui.newTrain(20);
-train.putOnTrack(tsui.tracks[0], 55, 1);
+train.putOnTrack(tsui.tracks[0], 25, 1);
 
 tsui.trainSimulator.sortElements();
 tsui.redraw();
@@ -99,7 +74,7 @@ function toggleMove() {
 
         </script>
         <button type="button" onclick="toggleMove()">GO / STOP</button>
-        <button type="button" onclick="builder.switches['switch1'].toggle()">Switch 1</button>
+        <button type="button" onclick="builder.switches['switch1'].toggle();builder.switches['switch2'].toggle();builder.switches['switch3'].toggle();builder.switches['switch4'].toggle();">Switch All</button>
         <button type="button" onclick="document.getElementById('speed').value = document.getElementById('speed').value - 1">Speed down</button><input type="text" id="speed" value="1" size="2" /><button type="button" onclick="document.getElementById('speed').value = parseInt(document.getElementById('speed').value) + 1">Speed up</button>
     </body>
 </html>
