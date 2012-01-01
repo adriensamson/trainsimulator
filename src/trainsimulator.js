@@ -178,7 +178,8 @@ var Train = function(size) {
                 }
             }
         };
-        track.addElement(this.elementTail, tailPosition);
+        track.addElement(this.elementTail, position);
+        track.sortElements();
     };
     this.move = function(dist) {
         this.elementHead.x += this.elementHead.direction * dist;
@@ -186,7 +187,7 @@ var Train = function(size) {
     };
     this.getTrackParts = function() {
         var parts = [];
-        var newPart = {track: this.elementTail.track, from: this.elementTail.x};
+        var newPart = {track: this.elementHead.track, from: this.elementHead.x};
         var i;
         for (i = 0; i < this.trackPartitions.length; i++) {
             var partition = this.trackPartitions[i];
@@ -202,7 +203,7 @@ var Train = function(size) {
                 console.log('getTrackParts: no corresponding track');
             }
         }
-        newPart.to = this.elementHead.x;
+        newPart.to = this.elementTail.x;
         parts[parts.length] = newPart;
         return parts;
     };

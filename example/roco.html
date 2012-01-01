@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Train simulator</title>
+        <script type="text/javascript" src="../src/trainsimulator.js"></script>
+        <script type="text/javascript" src="../src/trainsimulatorui.js"></script>
+        <script type="text/javascript" src="../src/builder.js"></script>
+        <script type="text/javascript" src="../src/roco.js"></script>
+    </head>
+    <body>
+        <h1>Train simulator TEST</h1>
+        <canvas id="canvas" width="800" height="200"></canvas><br />
+        <script type="text/javascript">
+var schema = {
+    'origin': {x: 500, y: 50, angle: 0},
+    'pieces': [].concat(
+        RocoPieces.straight200({name: 'top'}),
+        RocoPieces.straight185(),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
+        RocoPieces.straight185(),
+        RocoPieces.straight200(),
+        
+        RocoPieces.curve3right(),
+        RocoPieces.curve3right(),
+        RocoPieces.curve3right(),
+        RocoPieces.curve3right(),
+        RocoPieces.curve3right(),
+        RocoPieces.curve3right({endPoint: 'sw1-1'}),
+        
+        RocoPieces.switchRight1('sw1', 'sw1-1', 'sw1-2', 'sw1-3'),
+        RocoPieces.straight185({startPoint: 'sw1-2', name: 'bottom'}),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
+        RocoPieces.straight185({endPoint: 'sw2-2'}),
+        RocoPieces.switchLeft2('sw2', 'sw2-1', 'sw2-2', 'sw2-3'),
+        
+        RocoPieces.curve3right({startPoint: 'sw2-1'}),
+        RocoPieces.curve3right(),
+        RocoPieces.curve3right(),
+        RocoPieces.curve3right(),
+        RocoPieces.curve3right(),
+        RocoPieces.curve3right({endPoint: 'origin'}),
+        
+        RocoPieces.counterCurveLeft({startPoint: 'sw1-3', name: 'middle'}),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
+        RocoPieces.counterCurveLeft({endPoint: 'sw2-3'})
+    )
+};
+var builder = new TrainSimulatorBuilder(document.getElementById('canvas'));
+var tsui = builder.tsui;
+builder.build(schema);
+tsui.scale = 0.2;
+tsui.trackWidth = 16;
+var train1 = tsui.newTrain(500);
+train1.putOnTrack(builder.tracks['top'], 5, 1);
+var train2 = tsui.newTrain(500);
+train2.putOnTrack(builder.tracks['bottom'], 5, 1);
+
+tsui.trainSimulator.sortElements();
+tsui.redraw();
+tsui.trainSimulator.sortElements();
+
+function move() {
+    train1.move(parseInt(document.getElementById('speed1').value));
+    train2.move(parseInt(document.getElementById('speed2').value));
+    tsui.trainSimulator.sortElements();
+    tsui.redraw();
+};
+
+setInterval(move, 100);
+        </script>
+        <button type="button" onclick="builder.switches['sw1'].toggle();builder.switches['sw2'].toggle();">Switch All</button>
+        <br />
+        <button type="button" onclick="document.getElementById('speed1').value = parseInt(document.getElementById('speed1').value) - 1">Speed down</button>
+        <input type="text" id="speed1" value="0" size="2" />
+        <button type="button" onclick="document.getElementById('speed1').value = parseInt(document.getElementById('speed1').value) + 1">Speed up</button>
+        <br />
+        <button type="button" onclick="document.getElementById('speed2').value = parseInt(document.getElementById('speed2').value) - 1">Speed down</button>
+        <input type="text" id="speed2" value="0" size="2" />
+        <button type="button" onclick="document.getElementById('speed2').value = parseInt(document.getElementById('speed2').value) + 1">Speed up</button>
+        
+    </body>
+</html>
+

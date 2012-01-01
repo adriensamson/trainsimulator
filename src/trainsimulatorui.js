@@ -7,6 +7,9 @@ var TrainSimulatorUi = function(canvas) {
     
     this.canvas = canvas;
     
+    this.scale = 1;
+    this.trackWidth = 1;
+    
     this.newTrack = function() {
         var track = this.trainSimulator.newTrack();
         this.tracks.push(track);
@@ -62,7 +65,7 @@ var TrainSimulatorUi = function(canvas) {
     this.drawTracks = function() {
         var ctx = canvas.getContext("2d");
         ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
-        ctx.lineWidth = 1;
+        ctx.lineWidth = this.trackWidth;
         var i;
         for (i = 0; i < this.tracks.length; i++) {
             var track = this.tracks[i];
@@ -72,39 +75,25 @@ var TrainSimulatorUi = function(canvas) {
         }
     };
     
-    this.drawJoints = function() {
-        var i;
-        var ctx = canvas.getContext("2d");
-        ctx.strokeStyle = 'rgba(255, 0, 0, 0.6)';
-        ctx.lineWidth = 2;
-        for (i = 0; i < this.joints.length; i++) {
-            var jointTrack = this.joints[i].tracks[1];
-            jointTrack.track.draw(ctx, jointTrack.position, jointTrack.position - jointTrack.direction * 5);
-            
-            var jointTrack = this.joints[i].tracks[2];
-            jointTrack.track.draw(ctx, jointTrack.position, jointTrack.position - jointTrack.direction * 5);
-            
-        }
-    };
     this.drawSwitches = function() {
         var i;
         var ctx = canvas.getContext("2d");
         ctx.strokeStyle = 'rgba(255, 0, 0, 0.6)';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = this.trackWidth * 1.5;
         for (i = 0; i < this.switches.length; i++) {
             
             var jointTrack = this.switches[i].tracks[1];
-            jointTrack.track.draw(ctx, jointTrack.position, jointTrack.position - jointTrack.direction * 15);
+            jointTrack.track.draw(ctx, jointTrack.position, jointTrack.position - jointTrack.direction * 100);
             
             var jointTrack = this.switches[i].tracks[this.switches[i].nextTrack(1)];
-            jointTrack.track.draw(ctx, jointTrack.position, jointTrack.position - jointTrack.direction * 15);
+            jointTrack.track.draw(ctx, jointTrack.position, jointTrack.position - jointTrack.direction * 100);
             
         }
     };
     this.drawTrains = function() {
         var ctx = canvas.getContext("2d");
         ctx.strokeStyle = 'rgba(0, 0, 255, 1)';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = this.trackWidth * 2;
         var i, j;
         for (i = 0; i < this.trains.length; i++) {
             var train = this.trains[i];
@@ -118,11 +107,14 @@ var TrainSimulatorUi = function(canvas) {
     
     this.redraw = function() {
         var ctx = canvas.getContext("2d");
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.scale(this.scale, this.scale);
+        ctx.save();
         this.drawTracks();
-        //this.drawJoints();
         this.drawSwitches();
         this.drawTrains();
+        ctx.restore();
     }
 }
 
