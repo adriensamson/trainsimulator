@@ -15,7 +15,7 @@ var Utils = {
     },
     clone: function (object) {
         var newObject = {};
-        for (prop in object) {
+        for (var prop in object) {
             newObject[prop] = object[prop];
         }
         return newObject;
@@ -106,13 +106,8 @@ var Switch = function() {
     */
     this.tracks = {};
     this.switch = false;
-    this.hoverCount = 0;
     this.toggle = function() {
-        if (this.hoverCount === 0) {
-            this.switch = !this.switch;
-        } else {
-            console.warn('switch can\'t be toggled when hovered');
-        }
+        this.switch = !this.switch;
     };
     this.nextTrack = function(num) {
         if (num != 1) {
@@ -147,12 +142,6 @@ var Switch = function() {
                     }
                 }
             },
-            upped: function (train) {
-                joint.hoverCount += 1;
-            },
-            downed: function (train) {
-                joint.hoverCount -= 1;
-            }
         };
         track.addElement(element, position);
     };
@@ -246,8 +235,7 @@ var Train = function(size) {
             if (trackPart.track === elm.track) {
                 if (trackPart.from < elm.x && elm.x <= trackPart.to
                     || trackPart.to < elm.x && elm.x <= trackPart.from
-                    || i != 0 && trackPart.from === elm.x && trackPart.from < trackPart.to
-                    || i != trackParts.length - 1 && trackPart.to === elm.x && trackPart.to < trackPart.from
+                    || i != 0 && i != trackParts.length - 1 && (trackPart.from === elm.x && trackPart.to === elm.x)
                 ) {
                     return true;
                 }

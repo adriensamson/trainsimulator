@@ -6,6 +6,7 @@
         <script type="text/javascript" src="../src/trainsimulatorui.js"></script>
         <script type="text/javascript" src="../src/builder.js"></script>
         <script type="text/javascript" src="../src/roco.js"></script>
+        <script type="text/javascript" src="../src/automatic.js"></script>
     </head>
     <body>
         <h1>Train simulator TEST</h1>
@@ -76,70 +77,39 @@ block.addSignal(builder.tracks['bottom'], 100, -1);
 block.addEntry(builder.tracks['middle'], 100, 50);
 block.addSignal(builder.tracks['middle'], 100, -1);
 
-
-var AutomaticTrain = function (size) {
-    this.Train = Train;
-    this.Train(size);
-    var train = this;
-    this.speed = 0;
-    this.orderSpeed = 0;
-    this.lastSpeed;
-    this.elementSignal = {
-        direction: 1,
-        swaped: function (elm) {
-            if (elm.signal && elm.direction === this.direction) {
-                if (elm.signal() === 'stop') {
-                    train.speed = 0;
-                }
-            }
-        }
-    };
-    this.tick = function () {
-        if (this.elementSignal.track) {
-            this.elementSignal.track.removeElement(this.elementSignal);
-        }
-        if (this.orderSpeed >= 0) {
-            this.elementSignal.direction = this.elementHead.direction;
-        } else {
-            this.elementSignal.direction = this.elementTail.direction;
-        }
-        this.move(this.speed);
-        if (this.orderSpeed >= 0) {
-            this.elementSignal.x = this.elementHead.x + 2 * this.orderSpeed;
-            this.elementHead.track.addElement(this.elementSignal, this.elementHead.x - this.speed);
-        } else {
-            this.elementSignal.x = this.elementTail.x + 2 * this.orderSpeed;
-            this.elementTail.track.addElement(this.elementSignal, this.elementTail.x - this.speed);
-        }
-        train.speed = train.orderSpeed;
-    };
-};
-
 var train1 = new AutomaticTrain(500);
 tsui.trains.push(train1);
 train1.putOnTrack(builder.tracks['middle-end'], 100.5, 1);
-train1.orderSpeed = 20;
-train1.speed = 20;
+train1.maxSpeed = 300;
+train1.accel = 100;
+train1.brakingAccel = 500;
+train1.minForwardView = 200;
 var train2 = new AutomaticTrain(500);
 tsui.trains.push(train2);
 train2.putOnTrack(builder.tracks['bottom-end'], 5.5, 1);
-train2.orderSpeed = -20;
-train2.speed = -20;
+train2.maxSpeed = 200;
+train2.accel = 100;
+train2.brakingAccel = 500;
+train2.direction = -1;
+train2.minForwardView = 200;
 
 builder.switches['sw1'].toggle();
 tsui.trainSimulator.sortElements();
 tsui.redraw();
 tsui.trainSimulator.sortElements();
 
-
-function tick() {
-    train1.tick();
-    train2.tick();
-    tsui.trainSimulator.sortElements();
-    tsui.redraw();
+tsui.tick = function () {
+    this.trainSimulator.sortElements();
+    this.redraw();
 };
 
-setInterval(tick, 100);
+var ticker = new Ticker();
+ticker.tickDelta = 0.05;
+ticker.registerTickable(tsui);
+ticker.registerTickable(train1);
+ticker.registerTickable(train2);
+ticker.run();
+
         </script>
         <!--button type="button" onclick="builder.switches['sw1'].toggle();builder.switches['sw2'].toggle();">Switch All</button-->
         <br />

@@ -95,7 +95,7 @@ var TrainSimulatorBuilder = function (canvas) {
         var connectSwitch = function (switchPointInfo, trackPointInfo) {
             switchPointInfo.switch.connectTrack(switchPointInfo.num, trackPointInfo.track, trackPointInfo.position, trackPointInfo.direction);
         };
-        for (pointName in this.points) {
+        for (var pointName in this.points) {
             var pointArray = this.points[pointName];
             if (pointArray.length == 2) {
                 if (pointArray[0].type == 'track' && pointArray[1].type == 'track') {
