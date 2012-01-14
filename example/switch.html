@@ -8,41 +8,21 @@
     </head>
     <body>
         <h1>Train simulator TEST</h1>
-        <canvas id="canvas" width="300" height="300"></canvas>
+        <canvas id="canvas" width="800" height="200"></canvas><br />
         <script type="text/javascript">
-/var tsui = new TrainSimulatorUi(document.getElementById('canvas'));*/
-
-
-
 var schema = {
-    'origin': {x: 60, y: 10, angle: 0},
+    'origin': {x: 300, y: 10, angle: 0},
     'pieces': [
-        {type: 'straight', length: 40, endPoint: 'sw3.2'},
-
-        {type: 'switch', name:'switch3', point1: 'sw3.1', point2: 'sw3.2', point3: 'sw3.3'},
-
-        {type: 'straight', length: 70, startPoint: 'sw3.1', endPoint: 'sw1.1'},
-        
+        {type: 'straight', length: 385, endPoint: 'sw1.2'},
         {type: 'switch', name:'switch1', point1: 'sw1.1', point2: 'sw1.2', point3: 'sw1.3'},
+        {type: 'straight', length: 200, startPoint: 'sw1.1'},
         
-        {type: 'straight', length: 40, startPoint: 'sw1.2'},
-        {type: 'curve', radius: 50, length: 50 * Math.PI, clockWise: true},
-        {type: 'straight', length: 40, endPoint: 'sw2.1'},
+        {type: 'curve', radius: 502.7, length: 502.7 * Math.PI / 8, clockWise: false, startPoint: 'sw1.3'},
+        {type: 'curve', radius: 502.7, length: 502.7 * Math.PI / 8, clockWise: true, endPoint: 'sw2.3'},
         
         {type: 'switch', name:'switch2', point1: 'sw2.1', point2: 'sw2.2', point3: 'sw2.3'},
-        
-        {type: 'straight', length: 70, startPoint: 'sw2.2', endPoint: 'sw4.2'},
-
-        {type: 'switch', name:'switch4', point1: 'sw4.1', point2: 'sw4.2', point3: 'sw4.3'},
-        
-        {type: 'straight', length: 40, startPoint: 'sw4.1'},
-        {type: 'curve', radius: 50, length: 50 * Math.PI, clockWise: true, endPoint: 'origin'},
-        
-        {type: 'curve', radius: 25, length: 25 * Math.PI, clockWise: true, startPoint: 'sw1.3'},
-        {type: 'curve', radius: 25, length: 25 * Math.PI, clockWise: false, endPoint: 'sw2.3'},
-        
-        {type: 'curve', radius: 25, length: 25 * Math.PI, clockWise: false, startPoint: 'sw3.3'},
-        {type: 'curve', radius: 25, length: 25 * Math.PI, clockWise: true, endPoint: 'sw4.3'}
+        {type: 'straight', length: 200, startPoint: 'sw2.1'},
+        {type: 'straight', length: 200, startPoint: 'sw2.2'},
     ]
 };
 var builder = new TrainSimulator.TrainSimulatorBuilder(document.getElementById('canvas'));

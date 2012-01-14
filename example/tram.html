@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Train simulator</title>
+        <script type="text/javascript" src="../src/trainsimulator.js"></script>
+        <script type="text/javascript" src="../src/trainsimulatorui.js"></script>
+        <script type="text/javascript" src="../src/builder.js"></script>
+        <script type="text/javascript" src="../src/roco.js"></script>
+        <script type="text/javascript" src="../src/automatic.js"></script>
+    </head>
+    <body>
+        <h1>Train simulator TEST</h1>
+        <canvas id="canvas" width="800" height="200"></canvas><br />
+        <script type="text/javascript">
+var schema = {
+    'origin': {x: 50, y: 50, angle: 0},
+    'pieces': [].concat(
+        RocoPieces.straight200({name: 'start-top'}),
+        RocoPieces.straight200(),
+        RocoPieces.straight185({endPoint: 'sw1.2'}),
+        
+        RocoPieces.switchLeft2('sw1', 'sw1.1', 'sw1.2', 'sw1.3'),
+        RocoPieces.switchLeft3('sw2', 'sw2.1', 'sw2.2', 'sw1.3'),
+        
+        RocoPieces.straight200({startPoint: 'sw1.1'}),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
+        RocoPieces.straight185({endPoint: 'sw3.2'}),
+        
+        RocoPieces.switchLeft2('sw3', 'sw3.1', 'sw3.2', 'sw3.3'),
+        RocoPieces.switchLeft3('sw4', 'sw4.1', 'sw4.2', 'sw3.3'),
+        
+        RocoPieces.straight200({startPoint: 'sw3.1'}),
+        RocoPieces.straight200({endPoint: 'top-right', name: 'end-top'}),
+
+        RocoPieces.straight185({startPoint: 'sw2.2'}),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
+        RocoPieces.straight200({endPoint: 'sw4.1'}),
+
+        RocoPieces.straight200({startPoint: 'sw2.1'}),
+        RocoPieces.straight200({endPoint: 'bottom-left', name: 'start-bottom'}),
+
+        RocoPieces.straight200({startPoint: 'sw4.2'}),
+        RocoPieces.straight200(),
+        RocoPieces.straight185({endPoint: 'bottom-right', name:'end-bottom'})
+    )
+};
+var builder = new TrainSimulator.TrainSimulatorBuilder(document.getElementById('canvas'));
+var tsui = builder.tsui;
+builder.build(schema);
+tsui.scale = 0.2;
+tsui.trackWidth = 16;
+
+/*
+var block = new Block();
+block.addEntry(builder.tracks['bottom-end'], 100, 150);
+block.addSignal(builder.tracks['bottom-end'], 100, 1);
+block.addEntry(builder.tracks['middle-end'], 100, 150);
+block.addSignal(builder.tracks['middle-end'], 100, 1);
+block.addEntry(builder.tracks['bottom'], 100, 50);
+block.addSignal(builder.tracks['bottom'], 100, -1);
+block.addEntry(builder.tracks['middle'], 100, 50);
+block.addSignal(builder.tracks['middle'], 100, -1);
+*/
+
+var train1 = new TrainSimulator.AutomaticTrain(200);
+tsui.trains.push(train1);
+train1.putOnTrack(builder.tracks['start-top'], 195, 1);
+train1.maxSpeed = 100;
+train1.accel = 30;
+train1.brakingAccel = 500;
+train1.minForwardView = 100;
+
+var train2 = new TrainSimulator.AutomaticTrain(200);
+tsui.trains.push(train2);
+train2.putOnTrack(builder.tracks['start-bottom'], 195, 1);
+train2.maxSpeed = 100;
+train2.accel = 30;
+train2.brakingAccel = 500;
+train2.direction = -1;
+train2.minForwardView = 100;
+
+var train3 = new TrainSimulator.AutomaticTrain(200);
+tsui.trains.push(train3);
+train3.putOnTrack(builder.tracks['end-bottom'], 195, 1);
+train3.maxSpeed = 100;
+train3.accel = 30;
+train3.brakingAccel = 500;
+train3.direction = -1;
+train3.minForwardView = 100;
+train3.order = 'stop';
+
+var train4 = new TrainSimulator.AutomaticTrain(200);
+tsui.trains.push(train4);
+train4.putOnTrack(builder.tracks['end-top'], 195, 1);
+train4.maxSpeed = 100;
+train4.accel = 30;
+train4.brakingAccel = 500;
+train4.direction = -1;
+train4.minForwardView = 100;
+
+for (var swname in builder.switches) {
+    builder.switches[swname].addBlock(100, 150);
+    builder.switches[swname].toggle();
+}
+
+var revertElement = function (track, position) {
+    var element = {
+        x: position,
+        direction: 1,
+        swaped: function(){},
+        upped: function (train) {
+            train.order = 'reverse';
+        }
+    };
+    track.addElement(element, position);
+}
+revertElement(builder.tracks['end-top'], 150);
+revertElement(builder.tracks['start-bottom'], 150);
+
+tsui.trainSimulator.sortElements();
+tsui.redraw();
+tsui.trainSimulator.sortElements();
+
+tsui.tick = function () {
+    this.trainSimulator.sortElements();
+    this.redraw();
+};
+
+var ticker = new TrainSimulator.Ticker();
+ticker.tickDelta = 0.05;
+ticker.registerTickable(train1);
+ticker.registerTickable(train2);
+ticker.registerTickable(train3);
+ticker.registerTickable(train4);
+ticker.registerTickable(tsui);
+ticker.run();
+
+        </script>
+        <!--button type="button" onclick="builder.switches['sw1'].toggle();builder.switches['sw2'].toggle();">Switch All</button-->
+        <br />
+        <!--button type="button" onclick="document.getElementById('speed1').value = parseInt(document.getElementById('speed1').value) - 1">Speed down</button>
+        <input type="text" id="speed1" value="0" size="2" />
+        <button type="button" onclick="document.getElementById('speed1').value = parseInt(document.getElementById('speed1').value) + 1">Speed up</button-->
+        <br />
+        <!--button type="button" onclick="document.getElementById('speed2').value = parseInt(document.getElementById('speed2').value) - 1">Speed down</button>
+        <input type="text" id="speed2" value="0" size="2" />
+        <button type="button" onclick="document.getElementById('speed2').value = parseInt(document.getElementById('speed2').value) + 1">Speed up</button-->
+        
+    </body>
+</html>
+

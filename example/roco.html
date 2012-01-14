@@ -10,50 +10,53 @@
     </head>
     <body>
         <h1>Train simulator TEST</h1>
-        <canvas id="canvas" width="800" height="200"></canvas><br />
+        <canvas id="canvas" width="800" height="300"></canvas><br />
         <script type="text/javascript">
 var schema = {
     'origin': {x: 500, y: 50, angle: 0},
     'pieces': [].concat(
-        RocoPieces.straight200({name: 'top'}),
-        RocoPieces.straight185(),
+        RocoPieces.switchRight1('sw1', 'origin', 'sw1-2', 'sw1-3'),
+        RocoPieces.straight185({startPoint: 'sw1-2', name: 'top'}),
         RocoPieces.straight200(),
         RocoPieces.straight200(),
         RocoPieces.straight200(),
         RocoPieces.straight200(),
-        RocoPieces.straight200(),
-        RocoPieces.straight200(),
-        RocoPieces.straight185(),
-        RocoPieces.straight200(),
-        
-        RocoPieces.curve3right(),
-        RocoPieces.curve3right(),
-        RocoPieces.curve3right(),
-        RocoPieces.curve3right(),
-        RocoPieces.curve3right(),
-        RocoPieces.curve3right({endPoint: 'sw1-1', name:'before-sw-1'}),
-        
-        RocoPieces.switchRight1('sw1', 'sw1-1', 'sw1-2', 'sw1-3'),
-        RocoPieces.straight185({startPoint: 'sw1-2', name: 'bottom'}),
-        RocoPieces.straight200(),
-        RocoPieces.straight200(),
-        RocoPieces.straight200(),
-        RocoPieces.straight200(),
-        RocoPieces.straight200(),
-        RocoPieces.straight200(),
-        RocoPieces.straight185({endPoint: 'sw2-2', name: 'bottom-end'}),
+        RocoPieces.straight185({endPoint: 'sw2-2', name: 'top-end'}),
         RocoPieces.switchLeft2('sw2', 'sw2-1', 'sw2-2', 'sw2-3'),
         
         RocoPieces.curve3right({startPoint: 'sw2-1', name: 'after-sw-2'}),
         RocoPieces.curve3right(),
+        RocoPieces.curve3right({name: 'before-sw-3', endPoint: 'sw3.1'}),
+        
+        RocoPieces.curveSwitchRight1('sw3', 'sw3.1', 'sw3.2', 'sw3.3'),
+        
+        RocoPieces.curve3right({startPoint: 'sw3.2', name: 'external'}),
+        RocoPieces.curve3right(),
+        RocoPieces.straight185(),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
+        RocoPieces.counterCurveRight({endPoint: 'sw4.3', name:'external-end'}),
+        
+        RocoPieces.curve3right({startPoint: 'sw3.3', name: 'internal'}),
+        RocoPieces.curve3right(),
+        RocoPieces.straight185(),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
+        RocoPieces.straight185({endPoint: 'sw4.2', name: 'internal-end'}),
+        
+        RocoPieces.switchRight3('sw4', 'sw4.1', 'sw4.2', 'sw4.3'),
+        
+        RocoPieces.straight200({startPoint: 'sw4.1', name:'after-sw-4'}),
+        RocoPieces.straight200(),
+        RocoPieces.straight200(),
         RocoPieces.curve3right(),
         RocoPieces.curve3right(),
         RocoPieces.curve3right(),
-        RocoPieces.curve3right({endPoint: 'origin'}),
+        RocoPieces.curve3right(),
+        RocoPieces.curve3right(),
+        RocoPieces.curve3right({endPoint: 'origin', name:'before-sw-1'}),
         
         RocoPieces.counterCurveLeft({startPoint: 'sw1-3', name: 'middle'}),
-        RocoPieces.straight200(),
-        RocoPieces.straight200(),
         RocoPieces.straight200(),
         RocoPieces.straight200(),
         RocoPieces.straight200(),
@@ -61,33 +64,43 @@ var schema = {
         RocoPieces.counterCurveLeft({endPoint: 'sw2-3', name: 'middle-end'})
     )
 };
-var builder = new TrainSimulatorBuilder(document.getElementById('canvas'));
+var builder = new TrainSimulator.TrainSimulatorBuilder(document.getElementById('canvas'));
 var tsui = builder.tsui;
 builder.build(schema);
 tsui.scale = 0.2;
 tsui.trackWidth = 16;
 
-var block = new Block();
-block.addEntry(builder.tracks['bottom-end'], 100, 150);
-block.addSignal(builder.tracks['bottom-end'], 100, 1);
+var block = new TrainSimulator.Block();
+block.addEntry(builder.tracks['top-end'], 100, 150);
+block.addSignal(builder.tracks['top-end'], 100, 1);
 block.addEntry(builder.tracks['middle-end'], 100, 150);
 block.addSignal(builder.tracks['middle-end'], 100, 1);
-block.addEntry(builder.tracks['bottom'], 100, 50);
-block.addSignal(builder.tracks['bottom'], 100, -1);
-block.addEntry(builder.tracks['middle'], 100, 50);
-block.addSignal(builder.tracks['middle'], 100, -1);
+block.addEntry(builder.tracks['internal'], 100, 50);
+block.addSignal(builder.tracks['internal'], 100, -1);
+block.addEntry(builder.tracks['external'], 100, 50);
+block.addSignal(builder.tracks['external'], 100, -1);
 
-var train1 = new AutomaticTrain(500);
+var block2 = new TrainSimulator.Block();
+block2.addEntry(builder.tracks['internal-end'], 100, 150);
+block2.addSignal(builder.tracks['internal-end'], 100, 1);
+block2.addEntry(builder.tracks['external-end'], 100, 150);
+block2.addSignal(builder.tracks['external-end'], 100, 1);
+block2.addEntry(builder.tracks['top'], 100, 50);
+block2.addSignal(builder.tracks['top'], 100, -1);
+block2.addEntry(builder.tracks['middle'], 100, 50);
+block2.addSignal(builder.tracks['middle'], 100, -1);
+
+var train1 = new TrainSimulator.AutomaticTrain(500);
 tsui.trains.push(train1);
 train1.putOnTrack(builder.tracks['middle-end'], 100.5, 1);
 train1.maxSpeed = 300;
 train1.accel = 100;
 train1.brakingAccel = 500;
 train1.minForwardView = 200;
-var train2 = new AutomaticTrain(500);
+var train2 = new TrainSimulator.AutomaticTrain(500);
 tsui.trains.push(train2);
-train2.putOnTrack(builder.tracks['bottom-end'], 5.5, 1);
-train2.maxSpeed = 200;
+train2.putOnTrack(builder.tracks['top-end'], 5.5, 1);
+train2.maxSpeed = 300;
 train2.accel = 100;
 train2.brakingAccel = 500;
 train2.direction = -1;
@@ -103,11 +116,11 @@ tsui.tick = function () {
     this.redraw();
 };
 
-var ticker = new Ticker();
+var ticker = new TrainSimulator.Ticker();
 ticker.tickDelta = 0.05;
-ticker.registerTickable(tsui);
 ticker.registerTickable(train1);
 ticker.registerTickable(train2);
+ticker.registerTickable(tsui);
 ticker.run();
 
         </script>
