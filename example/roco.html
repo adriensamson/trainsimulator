@@ -3,7 +3,7 @@
     <head>
         <title>Train simulator</title>
         <script type="text/javascript" src="../src/trainsimulator.js"></script>
-        <script type="text/javascript" src="../src/trainsimulatorui.js"></script>
+        <script type="text/javascript" src="../src/drawer.js"></script>
         <script type="text/javascript" src="../src/builder.js"></script>
         <script type="text/javascript" src="../src/roco.js"></script>
         <script type="text/javascript" src="../src/automatic.js"></script>
@@ -64,55 +64,55 @@ var schema = {
         RocoPieces.counterCurveLeft({endPoint: 'sw2-3', name: 'middle-end'})
     )
 };
-var builder = new TrainSimulator.TrainSimulatorBuilder(document.getElementById('canvas'));
-var tsui = builder.tsui;
+var builder = new TrainSimulator.TrainSimulatorBuilder();
+var drawer = new TrainSimulator.CanvasDrawer(document.getElementById('canvas'));
+var trainSimulator = new TrainSimulator.TrainSimulator();
 builder.build(schema);
-tsui.scale = 0.2;
-tsui.trackWidth = 16;
+builder.registerToTrainSimulator(trainSimulator);
+builder.registerToDrawer(drawer);
+drawer.scale = 0.2;
+drawer.trackWidth = 16;
 
 var block = new TrainSimulator.Block();
-block.addEntry(builder.tracks['top-end'], 100, 150);
-block.addSignal(builder.tracks['top-end'], 100, 1);
-block.addEntry(builder.tracks['middle-end'], 100, 150);
-block.addSignal(builder.tracks['middle-end'], 100, 1);
-block.addEntry(builder.tracks['internal'], 100, 50);
-block.addSignal(builder.tracks['internal'], 100, -1);
-block.addEntry(builder.tracks['external'], 100, 50);
-block.addSignal(builder.tracks['external'], 100, -1);
+block.addEntry(builder.namedTracks['top-end'], 100, 150);
+block.addSignal(builder.namedTracks['top-end'], 100, 1);
+block.addEntry(builder.namedTracks['middle-end'], 100, 150);
+block.addSignal(builder.namedTracks['middle-end'], 100, 1);
+block.addEntry(builder.namedTracks['internal'], 100, 50);
+block.addSignal(builder.namedTracks['internal'], 100, -1);
+block.addEntry(builder.namedTracks['external'], 100, 50);
+block.addSignal(builder.namedTracks['external'], 100, -1);
 
 var block2 = new TrainSimulator.Block();
-block2.addEntry(builder.tracks['internal-end'], 100, 150);
-block2.addSignal(builder.tracks['internal-end'], 100, 1);
-block2.addEntry(builder.tracks['external-end'], 100, 150);
-block2.addSignal(builder.tracks['external-end'], 100, 1);
-block2.addEntry(builder.tracks['top'], 100, 50);
-block2.addSignal(builder.tracks['top'], 100, -1);
-block2.addEntry(builder.tracks['middle'], 100, 50);
-block2.addSignal(builder.tracks['middle'], 100, -1);
+block2.addEntry(builder.namedTracks['internal-end'], 100, 150);
+block2.addSignal(builder.namedTracks['internal-end'], 100, 1);
+block2.addEntry(builder.namedTracks['external-end'], 100, 150);
+block2.addSignal(builder.namedTracks['external-end'], 100, 1);
+block2.addEntry(builder.namedTracks['top'], 100, 50);
+block2.addSignal(builder.namedTracks['top'], 100, -1);
+block2.addEntry(builder.namedTracks['middle'], 100, 50);
+block2.addSignal(builder.namedTracks['middle'], 100, -1);
 
 var train1 = new TrainSimulator.AutomaticTrain(500);
-tsui.trains.push(train1);
-train1.putOnTrack(builder.tracks['middle-end'], 100.5, 1);
+drawer.addTrain(train1);
+train1.putOnTrack(builder.namedTracks['middle-end'], 100.5, 1);
 train1.maxSpeed = 300;
 train1.accel = 100;
 train1.brakingAccel = 500;
 train1.minForwardView = 200;
 var train2 = new TrainSimulator.AutomaticTrain(500);
-tsui.trains.push(train2);
-train2.putOnTrack(builder.tracks['top-end'], 5.5, 1);
+drawer.addTrain(train2);
+train2.putOnTrack(builder.namedTracks['top-end'], 5.5, 1);
 train2.maxSpeed = 300;
 train2.accel = 100;
 train2.brakingAccel = 500;
 train2.direction = -1;
 train2.minForwardView = 200;
 
-builder.switches['sw1'].toggle();
-tsui.trainSimulator.sortElements();
-tsui.redraw();
-tsui.trainSimulator.sortElements();
+builder.namedSwitches['sw1'].toggle();
 
-tsui.tick = function () {
-    this.trainSimulator.sortElements();
+drawer.tick = function () {
+    trainSimulator.sortElements();
     this.redraw();
 };
 
@@ -120,19 +120,10 @@ var ticker = new TrainSimulator.Ticker();
 ticker.tickDelta = 0.05;
 ticker.registerTickable(train1);
 ticker.registerTickable(train2);
-ticker.registerTickable(tsui);
+ticker.registerTickable(drawer);
 ticker.run();
 
         </script>
-        <!--button type="button" onclick="builder.switches['sw1'].toggle();builder.switches['sw2'].toggle();">Switch All</button-->
-        <br />
-        <!--button type="button" onclick="document.getElementById('speed1').value = parseInt(document.getElementById('speed1').value) - 1">Speed down</button>
-        <input type="text" id="speed1" value="0" size="2" />
-        <button type="button" onclick="document.getElementById('speed1').value = parseInt(document.getElementById('speed1').value) + 1">Speed up</button-->
-        <br />
-        <!--button type="button" onclick="document.getElementById('speed2').value = parseInt(document.getElementById('speed2').value) - 1">Speed down</button>
-        <input type="text" id="speed2" value="0" size="2" />
-        <button type="button" onclick="document.getElementById('speed2').value = parseInt(document.getElementById('speed2').value) + 1">Speed up</button-->
         
     </body>
 </html>

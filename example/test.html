@@ -3,17 +3,13 @@
     <head>
         <title>Train simulator</title>
         <script type="text/javascript" src="../src/trainsimulator.js"></script>
-        <script type="text/javascript" src="../src/trainsimulatorui.js"></script>
+        <script type="text/javascript" src="../src/drawer.js"></script>
         <script type="text/javascript" src="../src/builder.js"></script>
     </head>
     <body>
         <h1>Train simulator TEST</h1>
         <canvas id="canvas" width="300" height="300"></canvas>
         <script type="text/javascript">
-/var tsui = new TrainSimulatorUi(document.getElementById('canvas'));*/
-
-
-
 var schema = {
     'origin': {x: 60, y: 10, angle: 0},
     'pieces': [
@@ -45,21 +41,25 @@ var schema = {
         {type: 'curve', radius: 25, length: 25 * Math.PI, clockWise: true, endPoint: 'sw4.3'}
     ]
 };
-var builder = new TrainSimulator.TrainSimulatorBuilder(document.getElementById('canvas'));
-var tsui = builder.tsui;
+var builder = new TrainSimulator.TrainSimulatorBuilder();
+var drawer = new TrainSimulator.CanvasDrawer(document.getElementById('canvas'));
+var trainSimulator = new TrainSimulator.TrainSimulator();
 builder.build(schema);
+builder.registerToTrainSimulator(trainSimulator);
+builder.registerToDrawer(drawer);
 
-var train = tsui.newTrain(20);
-train.putOnTrack(tsui.tracks[0], 25, 1);
+var train = new TrainSimulator.Train(20);
+drawer.addTrain(train);
+train.putOnTrack(trainSimulator.tracks[0], 25, 1);
 
-tsui.trainSimulator.sortElements();
-tsui.redraw();
-tsui.trainSimulator.sortElements();
+trainSimulator.sortElements();
+drawer.redraw();
+trainSimulator.sortElements();
 
 function move() {
     train.move(parseInt(document.getElementById('speed').value));
-    tsui.trainSimulator.sortElements();
-    tsui.redraw();
+    trainSimulator.sortElements();
+    drawer.redraw();
 };
 
 var movingInterval = false;
@@ -74,7 +74,7 @@ function toggleMove() {
 
         </script>
         <button type="button" onclick="toggleMove()">GO / STOP</button>
-        <button type="button" onclick="builder.switches['switch1'].toggle();builder.switches['switch2'].toggle();builder.switches['switch3'].toggle();builder.switches['switch4'].toggle();">Switch All</button>
+        <button type="button" onclick="builder.namedSwitches['switch1'].toggle();builder.namedSwitches['switch2'].toggle();builder.namedSwitches['switch3'].toggle();builder.namedSwitches['switch4'].toggle();">Switch All</button>
         <button type="button" onclick="document.getElementById('speed').value = document.getElementById('speed').value - 1">Speed down</button><input type="text" id="speed" value="1" size="2" /><button type="button" onclick="document.getElementById('speed').value = parseInt(document.getElementById('speed').value) + 1">Speed up</button>
     </body>
 </html>

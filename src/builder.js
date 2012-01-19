@@ -1,14 +1,19 @@
 (function (ts) {
     'use strict';
 
-    ts.TrainSimulatorBuilder = function (canvas) {
-        this.tsui = new ts.TrainSimulatorUi(canvas);
+    ts.TrainSimulatorBuilder = function (trainSimulator) {
         this.points = {};
-        this.tracks = {};
-        this.switches = {};
-        
+        this.tracks = [];
+        this.switches = [];
+        this.namedTracks = {};
+        this.namedSwitches = {};
+                
         this.addStraightPiece = function (piece, currentPoint) {
-            var newTrack = this.tsui.newStraightTrack({x: currentPoint.x, y: currentPoint.y}, currentPoint.angle);
+            var newTrack = new ts.Track();
+            this.tracks.push(newTrack);
+            newTrack.origin = {x: currentPoint.x, y: currentPoint.y};
+            newTrack.angle = currentPoint.angle;
+            
             currentPoint.x += piece.length * Math.cos(currentPoint.angle);
             currentPoint.y += piece.length * Math.sin(currentPoint.angle);
             this.addTrackPiecePoints(piece, newTrack, currentPoint);
@@ -16,27 +21,30 @@
         };
         
         this.addCurvePiece = function (piece, currentPoint) {
-            var center, startAngle, endAngle, futureCurrentAngle, newTrack;
+            var endAngle, futureCurrentAngle, newTrack;
+            newTrack = new ts.Track();
+            this.tracks.push(newTrack);
+            newTrack.radius = piece.radius;
+            newTrack.antiClockWise = !piece.clockWise;
             if (piece.clockWise) {
-                center = {
+                newTrack.center = {
                     x: currentPoint.x + piece.radius * Math.cos(currentPoint.angle + Math.PI/2),
                     y: currentPoint.y + piece.radius * Math.sin(currentPoint.angle + Math.PI/2)
                 };
-                startAngle = currentPoint.angle - Math.PI / 2;
-                endAngle = startAngle + piece.length / piece.radius;
+                newTrack.originAngle = currentPoint.angle - Math.PI / 2;
+                endAngle = newTrack.originAngle + piece.length / piece.radius;
                 futureCurrentAngle = endAngle + Math.PI / 2;
             } else {
-                center = {
+                newTrack.center = {
                     x: currentPoint.x + piece.radius * Math.cos(currentPoint.angle - Math.PI/2),
                     y: currentPoint.y + piece.radius * Math.sin(currentPoint.angle - Math.PI/2)
                 };
-                startAngle = currentPoint.angle + Math.PI / 2;
-                endAngle = startAngle - piece.length / piece.radius;
+                newTrack.originAngle = currentPoint.angle + Math.PI / 2;
+                endAngle = newTrack.originAngle - piece.length / piece.radius;
                 futureCurrentAngle = endAngle - Math.PI / 2;
             }
-            newTrack = this.tsui.newCurveTrack(center, piece.radius, startAngle, !piece.clockWise);
-            currentPoint.x = center.x + piece.radius * Math.cos(endAngle);
-            currentPoint.y = center.y + piece.radius * Math.sin(endAngle);
+            currentPoint.x = newTrack.center.x + piece.radius * Math.cos(endAngle);
+            currentPoint.y = newTrack.center.y + piece.radius * Math.sin(endAngle);
             currentPoint.angle = futureCurrentAngle;
             this.addTrackPiecePoints(piece, newTrack, currentPoint);
             return newTrack;
@@ -67,12 +75,13 @@
                 });
             }
             if (piece.name !== undefined) {
-                this.tracks[piece.name] = track;
+                this.namedTracks[piece.name] = track;
             }
         };
         
         this.addSwitchPiece = function (piece, currentPoint) {
-            var sw = this.tsui.newSwitch();
+            var sw = new ts.Switch()
+            this.switches.push(sw);
             var inversedPoint = {
                 x: currentPoint.x,
                 y: currentPoint.y,
@@ -82,7 +91,7 @@
             this.addPoint(piece.point2, {type: 'switch', sw: sw, num: 2, currentPoint: ts.Utils.clone(currentPoint)});
             this.addPoint(piece.point3, {type: 'switch', sw: sw, num: 3, currentPoint: ts.Utils.clone(currentPoint)});
             if (piece.name !== undefined) {
-                this.switches[piece.name] = sw;
+                this.namedSwitches[piece.name] = sw;
             }
         };
         
@@ -104,7 +113,7 @@
                     pointArray = this.points[pointName];
                     if (pointArray.length === 2) {
                         if (pointArray[0].type === 'track' && pointArray[1].type === 'track') {
-                            joint = this.tsui.newJoint();
+                            joint = new ts.Joint();
                             joint.connectTrack(1, pointArray[0].track, pointArray[0].position, pointArray[0].direction);
                             joint.connectTrack(2, pointArray[1].track, pointArray[1].position, pointArray[1].direction);
                         } else if (pointArray[0].type === 'switch' && pointArray[1].type === 'track') {
@@ -152,7 +161,7 @@
                 if (lastTrack !== undefined && newTrack !== undefined &&
                     schema.pieces[i-1].endPoint === undefined && piece.startPoint === undefined
                 ) {
-                    joint = this.tsui.newJoint();
+                    joint = new ts.Joint();
                     joint.connectTrack(1, lastTrack, schema.pieces[i-1].length, 1);
                     joint.connectTrack(2, newTrack, 0, -1);
                 }
@@ -162,6 +171,23 @@
                 }
             }
             this.doConnects();
+        };
+        
+        this.registerToTrainSimulator = function (trainSimulator) {
+            var i;
+            for (i = 0; i < this.tracks.length; i++) {
+                trainSimulator.tracks.push(this.tracks[i]);
+            }
+        };
+        
+        this.registerToDrawer = function (drawer) {
+            var i;
+            for (i = 0; i < this.tracks.length; i++) {
+                drawer.addTrack(this.tracks[i]);
+            }
+            for (i = 0; i < this.switches.length; i++) {
+                drawer.addSwitch(this.switches[i]);
+            }
         };
     };
 })(TrainSimulator);

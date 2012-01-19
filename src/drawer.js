@@ -1,10 +1,8 @@
 (function (ts) {
     'use strict';
 
-    ts.TrainSimulatorUi = function (canvas) {
-        this.trainSimulator = new ts.TrainSimulator();
+    ts.CanvasDrawer = function (canvas) {
         this.tracks = [];
-        this.joints = [];
         this.switches = [];
         this.trains = [];
         
@@ -13,8 +11,7 @@
         this.scale = 1;
         this.trackWidth = 1;
         
-        this.newTrack = function() {
-            var track = this.trainSimulator.newTrack();
+        this.addTrack = function (track) {
             this.tracks.push(track);
             return track;
         };
@@ -23,49 +20,36 @@
             track.type = 'straight';
             track.origin = origin;
             track.angle = angle;
-            track.draw = function(ctx, from, to) {
-                ctx.beginPath();
-                ctx.moveTo(this.origin.x + from * Math.cos(this.angle), this.origin.y + from * Math.sin(this.angle));
-                ctx.lineTo(this.origin.x + to * Math.cos(this.angle), this.origin.y + to * Math.sin(this.angle));
-                ctx.stroke();
-            };
-            return track;
-        };
-        this.newCurveTrack = function(center, radius, originAngle, antiClockWise) {
-            var track = this.newTrack();
-            track.type = 'curve';
-            track.center = center;
-            track.radius = radius;
-            track.originAngle = originAngle;
-            track.antiClockWise = antiClockWise;
-            track.draw = function(ctx, from, to) {
-                var drawAntiClockWise = (from < to ) ? this.antiClockWise : !this.antiClockWise;
-                var drawOriginAngle = this.originAngle + ((this.antiClockWise) ? -1 : 1) * from / this.radius;
-                var drawEndAngle = this.originAngle + ((this.antiClockWise) ? -1 : 1) * to / this.radius;
-                ctx.beginPath();
-                ctx.arc(this.center.x, this.center.y, this.radius, drawOriginAngle, drawEndAngle, drawAntiClockWise);
-                ctx.stroke();
-            };
             return track;
         };
         
-        this.newJoint = function() {
-            var joint = new ts.Joint();
-            this.joints.push(joint);
-            return joint;
-        };
-        this.newSwitch = function() {
-            var sw = new ts.Switch();
+        this.addSwitch = function (sw) {
             this.switches.push(sw);
             return sw;
         };
-        this.newTrain = function(size) {
-            var train = new ts.Train(size);
+        
+        this.addTrain = function (train) {
             this.trains.push(train);
             return train;
         };
         
-        this.drawTracks = function() {
+        this.drawTrack = function (track, ctx, from, to) {
+            if (track.center) {
+                var drawAntiClockWise = (from < to ) ? track.antiClockWise : !track.antiClockWise;
+                var drawOriginAngle = track.originAngle + ((track.antiClockWise) ? -1 : 1) * from / track.radius;
+                var drawEndAngle = track.originAngle + ((track.antiClockWise) ? -1 : 1) * to / track.radius;
+                ctx.beginPath();
+                ctx.arc(track.center.x, track.center.y, track.radius, drawOriginAngle, drawEndAngle, drawAntiClockWise);
+                ctx.stroke();
+            } else {
+                ctx.beginPath();
+                ctx.moveTo(track.origin.x + from * Math.cos(track.angle), track.origin.y + from * Math.sin(track.angle));
+                ctx.lineTo(track.origin.x + to * Math.cos(track.angle), track.origin.y + to * Math.sin(track.angle));
+                ctx.stroke();
+            }
+        }
+        
+        this.drawTracks = function () {
             var ctx = canvas.getContext("2d");
             ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
             ctx.lineWidth = this.trackWidth;
@@ -74,11 +58,11 @@
                 var track = this.tracks[i];
                 var from = track.elements[0].x;
                 var to = track.elements[track.elements.length - 1].x;
-                track.draw(ctx, from, to);
+                this.drawTrack(track, ctx, from, to);
             }
         };
         
-        this.drawSwitches = function() {
+        this.drawSwitches = function () {
             var i;
             var ctx = canvas.getContext("2d");
             ctx.strokeStyle = 'rgba(255, 0, 0, 0.6)';
@@ -86,14 +70,14 @@
             for (i = 0; i < this.switches.length; i++) {
                 
                 var jointTrack = this.switches[i].tracks[1];
-                jointTrack.track.draw(ctx, jointTrack.position, jointTrack.position - jointTrack.direction * 20 / this.scale);
+                this.drawTrack(jointTrack.track, ctx, jointTrack.position, jointTrack.position - jointTrack.direction * 20 / this.scale);
                 
                 jointTrack = this.switches[i].tracks[this.switches[i].nextTrack(1)];
-                jointTrack.track.draw(ctx, jointTrack.position, jointTrack.position - jointTrack.direction * 20 / this.scale);
+                this.drawTrack(jointTrack.track, ctx, jointTrack.position, jointTrack.position - jointTrack.direction * 20 / this.scale);
                 
             }
         };
-        this.drawTrains = function() {
+        this.drawTrains = function () {
             var ctx = canvas.getContext("2d");
             ctx.strokeStyle = 'rgba(0, 0, 255, 1)';
             ctx.lineWidth = this.trackWidth * 2;
@@ -103,12 +87,12 @@
                 var parts = train.getTrackParts();
                 for (j = 0; j < parts.length; j++) {
                     var part = parts[j];
-                    part.track.draw(ctx, part.from, part.to);
+                    this.drawTrack(part.track, ctx, part.from, part.to);
                 }
             }
         };
         
-        this.redraw = function() {
+        this.redraw = function () {
             var ctx = canvas.getContext("2d");
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.clearRect(0, 0, canvas.width, canvas.height);
