@@ -15,21 +15,21 @@ var schema = {
     'pieces': [
         {type: 'straight', length: 40, endPoint: 'sw3.2'},
 
-        {type: 'switch', name:'switch3', point1: 'sw3.1', point2: 'sw3.2', point3: 'sw3.3'},
+        {type: 'switch', name:'switch3', point0: 'sw3.1', point1: 'sw3.2', point2: 'sw3.3'},
 
         {type: 'straight', length: 70, startPoint: 'sw3.1', endPoint: 'sw1.1'},
         
-        {type: 'switch', name:'switch1', point1: 'sw1.1', point2: 'sw1.2', point3: 'sw1.3'},
+        {type: 'switch', name:'switch1', point0: 'sw1.1', point1: 'sw1.2', point2: 'sw1.3'},
         
         {type: 'straight', length: 40, startPoint: 'sw1.2'},
         {type: 'curve', radius: 50, length: 50 * Math.PI, clockWise: true},
         {type: 'straight', length: 40, endPoint: 'sw2.1'},
         
-        {type: 'switch', name:'switch2', point1: 'sw2.1', point2: 'sw2.2', point3: 'sw2.3'},
+        {type: 'switch', name:'switch2', point0: 'sw2.1', point1: 'sw2.2', point2: 'sw2.3'},
         
         {type: 'straight', length: 70, startPoint: 'sw2.2', endPoint: 'sw4.2'},
 
-        {type: 'switch', name:'switch4', point1: 'sw4.1', point2: 'sw4.2', point3: 'sw4.3'},
+        {type: 'switch', name:'switch4', point0: 'sw4.1', point1: 'sw4.2', point2: 'sw4.3'},
         
         {type: 'straight', length: 40, startPoint: 'sw4.1'},
         {type: 'curve', radius: 50, length: 50 * Math.PI, clockWise: true, endPoint: 'origin'},

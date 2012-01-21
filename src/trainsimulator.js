@@ -87,7 +87,7 @@ var TrainSimulator = {};
                     if (direction > 0 && elm.x > this.x ||
                         direction < 0 && elm.x < this.x
                     ) {
-                        var newTrackNum = num === 1 ? 2 : 1;
+                        var newTrackNum = num === 1 ? 0 : 1;
                         var newTrack = joint.tracks[newTrackNum];
                         var coeff = -1 * joint.tracks[num].direction * joint.tracks[newTrackNum].direction;
                         elm.x = newTrack.position + coeff * (elm.x - this.x);
@@ -106,11 +106,11 @@ var TrainSimulator = {};
 
     ts.Switch = function () {
         /*
-          2   3
-           \ /
-            y
+            1 2
+            |/
+            +
             |
-            1
+            0
         */
         this.tracks = {};
         this.sw = false;
@@ -118,12 +118,12 @@ var TrainSimulator = {};
             this.sw = !this.sw;
         };
         this.nextTrack = function (num) {
-            if (num !== 1) {
-                return 1;
+            if (num !== 0) {
+                return 0;
             } else if (this.sw) {
-                return 3;
+                return 2;
             }
-            return 2;
+            return 1;
         };
         this.connectTrack = function (num, track, position, direction) {
             this.tracks[num] = {
@@ -155,12 +155,12 @@ var TrainSimulator = {};
         };
         this.addBlock = function (innerDist, outerDist) {
             this.block = new ts.Block();
+            this.block.addEntry(this.tracks[0].track, this.tracks[0].position - this.tracks[0].direction * outerDist, this.tracks[0].position - this.tracks[0].direction * innerDist);
+            this.block.addSignal(this.tracks[0].track, this.tracks[0].position - this.tracks[0].direction * outerDist, this.tracks[0].direction);
             this.block.addEntry(this.tracks[1].track, this.tracks[1].position - this.tracks[1].direction * outerDist, this.tracks[1].position - this.tracks[1].direction * innerDist);
             this.block.addSignal(this.tracks[1].track, this.tracks[1].position - this.tracks[1].direction * outerDist, this.tracks[1].direction);
             this.block.addEntry(this.tracks[2].track, this.tracks[2].position - this.tracks[2].direction * outerDist, this.tracks[2].position - this.tracks[2].direction * innerDist);
             this.block.addSignal(this.tracks[2].track, this.tracks[2].position - this.tracks[2].direction * outerDist, this.tracks[2].direction);
-            this.block.addEntry(this.tracks[3].track, this.tracks[3].position - this.tracks[3].direction * outerDist, this.tracks[3].position - this.tracks[3].direction * innerDist);
-            this.block.addSignal(this.tracks[3].track, this.tracks[3].position - this.tracks[3].direction * outerDist, this.tracks[3].direction);
         };
     };
 

@@ -14,13 +14,13 @@ var schema = {
     'origin': {x: 300, y: 10, angle: 0},
     'pieces': [
         {type: 'straight', length: 385, endPoint: 'sw1.2'},
-        {type: 'switch', name:'switch1', point1: 'sw1.1', point2: 'sw1.2', point3: 'sw1.3'},
+        {type: 'switch', name:'switch1', point0: 'sw1.1', point1: 'sw1.2', point2: 'sw1.3'},
         {type: 'straight', length: 200, startPoint: 'sw1.1'},
         
         {type: 'curve', radius: 502.7, length: 502.7 * Math.PI / 8, clockWise: false, startPoint: 'sw1.3'},
         {type: 'curve', radius: 502.7, length: 502.7 * Math.PI / 8, clockWise: true, endPoint: 'sw2.3'},
         
-        {type: 'switch', name:'switch2', point1: 'sw2.1', point2: 'sw2.2', point3: 'sw2.3'},
+        {type: 'switch', name:'switch2', point0: 'sw2.1', point1: 'sw2.2', point2: 'sw2.3'},
         {type: 'straight', length: 200, startPoint: 'sw2.1'},
         {type: 'straight', length: 200, startPoint: 'sw2.2'},
     ]

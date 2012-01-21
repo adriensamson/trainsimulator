@@ -87,9 +87,9 @@
                 y: currentPoint.y,
                 angle: currentPoint.angle + Math.PI
             };
-            this.addPoint(piece.point1, {type: 'switch', sw: sw, num: 1, currentPoint: inversedPoint});
+            this.addPoint(piece.point0, {type: 'switch', sw: sw, num: 0, currentPoint: inversedPoint});
+            this.addPoint(piece.point1, {type: 'switch', sw: sw, num: 1, currentPoint: ts.Utils.clone(currentPoint)});
             this.addPoint(piece.point2, {type: 'switch', sw: sw, num: 2, currentPoint: ts.Utils.clone(currentPoint)});
-            this.addPoint(piece.point3, {type: 'switch', sw: sw, num: 3, currentPoint: ts.Utils.clone(currentPoint)});
             if (piece.name !== undefined) {
                 this.namedSwitches[piece.name] = sw;
             }
@@ -114,8 +114,8 @@
                     if (pointArray.length === 2) {
                         if (pointArray[0].type === 'track' && pointArray[1].type === 'track') {
                             joint = new ts.Joint();
-                            joint.connectTrack(1, pointArray[0].track, pointArray[0].position, pointArray[0].direction);
-                            joint.connectTrack(2, pointArray[1].track, pointArray[1].position, pointArray[1].direction);
+                            joint.connectTrack(0, pointArray[0].track, pointArray[0].position, pointArray[0].direction);
+                            joint.connectTrack(1, pointArray[1].track, pointArray[1].position, pointArray[1].direction);
                         } else if (pointArray[0].type === 'switch' && pointArray[1].type === 'track') {
                             connectSwitch(pointArray[0], pointArray[1]);
                         }  else if (pointArray[1].type === 'switch' && pointArray[0].type === 'track') {
@@ -127,7 +127,6 @@
         };
         
         this.build = function (schema) {
-            var points = {};
             var currentPoint = {x: schema.origin.x, y: schema.origin.y, angle: schema.origin.angle};
             var lastTrack, newTrack;
             var i, piece, joint;
@@ -145,15 +144,15 @@
                     }
                     newTrack = this.addCurvePiece(piece, currentPoint);
                 } else if (piece.type === 'switch') {
+                    if (this.points[piece.point0] !== undefined) {
+                        currentPoint = ts.Utils.clone(this.points[piece.point0][0].currentPoint);
+                    }
                     if (this.points[piece.point1] !== undefined) {
                         currentPoint = ts.Utils.clone(this.points[piece.point1][0].currentPoint);
+                        currentPoint.angle += Math.PI;
                     }
                     if (this.points[piece.point2] !== undefined) {
                         currentPoint = ts.Utils.clone(this.points[piece.point2][0].currentPoint);
-                        currentPoint.angle += Math.PI;
-                    }
-                    if (this.points[piece.point3] !== undefined) {
-                        currentPoint = ts.Utils.clone(this.points[piece.point3][0].currentPoint);
                         currentPoint.angle += Math.PI;
                     }
                     this.addSwitchPiece(piece, currentPoint);
@@ -162,8 +161,8 @@
                     schema.pieces[i-1].endPoint === undefined && piece.startPoint === undefined
                 ) {
                     joint = new ts.Joint();
-                    joint.connectTrack(1, lastTrack, schema.pieces[i-1].length, 1);
-                    joint.connectTrack(2, newTrack, 0, -1);
+                    joint.connectTrack(0, lastTrack, schema.pieces[i-1].length, 1);
+                    joint.connectTrack(1, newTrack, 0, -1);
                 }
                 lastTrack = newTrack;
                 if (i === 0 && newTrack !== undefined) {
