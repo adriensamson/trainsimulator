@@ -347,5 +347,6 @@ var TrainSimulator = {};
                 this.sortElements();
             }
         };
+        this.tick = this.sortElements;
     };
 })(TrainSimulator);

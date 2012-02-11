@@ -16,6 +16,9 @@
             
             currentPoint.x += piece.length * Math.cos(currentPoint.angle);
             currentPoint.y += piece.length * Math.sin(currentPoint.angle);
+            if (piece.color !== undefined) {
+            	newTrack.color = piece.color;
+            }
             this.addTrackPiecePoints(piece, newTrack, currentPoint);
             return newTrack;
         };
@@ -24,6 +27,7 @@
             var endAngle, futureCurrentAngle, newTrack;
             newTrack = new ts.Track();
             this.tracks.push(newTrack);
+            newTrack.origin = {x: currentPoint.x, y: currentPoint.y};
             newTrack.radius = piece.radius;
             newTrack.antiClockWise = !piece.clockWise;
             if (piece.clockWise) {
@@ -46,6 +50,9 @@
             currentPoint.x = newTrack.center.x + piece.radius * Math.cos(endAngle);
             currentPoint.y = newTrack.center.y + piece.radius * Math.sin(endAngle);
             currentPoint.angle = futureCurrentAngle;
+            if (piece.color !== undefined) {
+            	newTrack.color = piece.color;
+            }
             this.addTrackPiecePoints(piece, newTrack, currentPoint);
             return newTrack;
         };
@@ -53,9 +60,9 @@
         this.addTrackPiecePoints = function (piece, track, currentPoint) {
             if (piece.startPoint !== undefined) {
                 var inversedPoint = {
-                    x: currentPoint.x,
-                    y: currentPoint.y,
-                    angle: currentPoint.angle + Math.PI
+                    x: track.origin.x,
+                    y: track.origin.y,
+                    angle: track.angle + Math.PI
                 };
                 this.addPoint(piece.startPoint, {
                     type: 'track',
@@ -80,7 +87,7 @@
         };
         
         this.addSwitchPiece = function (piece, currentPoint) {
-            var sw = new ts.Switch()
+            var sw = new ts.Switch();
             this.switches.push(sw);
             var inversedPoint = {
                 x: currentPoint.x,
@@ -96,7 +103,7 @@
         };
         
         this.addPoint = function (name, pointInfo) {
-            if (this.points[name] === undefined) {
+            if (this.points[name] === undefined || this.points[name][0].type === 'fake') {
                 this.points[name] = [];
             }
             var pointArray = this.points[name];
@@ -127,9 +134,14 @@
         };
         
         this.build = function (schema) {
-            var currentPoint = {x: schema.origin.x, y: schema.origin.y, angle: schema.origin.angle};
+            var currentPoint = {x: 0, y: 0, angle: 0};
             var lastTrack, newTrack;
             var i, piece, joint;
+            for (i in schema.points) {
+            	if (schema.points.hasOwnProperty(i)) {
+            		this.addPoint(i, {type: 'fake', currentPoint: schema.points[i]});
+            	}
+            }
             for (i = 0; i < schema.pieces.length; i++) {
                 newTrack = undefined;
                 piece = schema.pieces[i];
@@ -165,9 +177,6 @@
                     joint.connectTrack(1, newTrack, 0, -1);
                 }
                 lastTrack = newTrack;
-                if (i === 0 && newTrack !== undefined) {
-                    this.addPoint('origin', {type: 'track', track: newTrack, position: 0, direction: -1});
-                }
             }
             this.doConnects();
         };

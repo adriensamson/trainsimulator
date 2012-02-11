@@ -2,20 +2,60 @@
     'use strict';
     
     ts.Ticker = function () {
-        this.tickables = [];
+        this.tickables = {
+    		input: [],
+    		move: [],
+    		resolve: [],
+    		output: []
+        };
         this.tickDelta = 0.1;
         this.ticking = false;
-        this.registerTickable = function (tickable) {
-            this.tickables.push(tickable);
+        this.registerInputTickable = function (tickable) {
+        	if (typeof tickable === 'object') {
+        		this.tickables.input.push(tickable.tick.bind(tickable));
+        	} else {
+        		this.tickables.input.push(tickable);
+        	}
+        };
+        this.registerMoveTickable = function (tickable) {
+        	if (typeof tickable === 'object') {
+        		this.tickables.move.push(tickable.tick.bind(tickable));
+        	} else {
+        		this.tickables.move.push(tickable);
+        	}
+        };
+        this.registerResolveTickable = function (tickable) {
+        	if (typeof tickable === 'object') {
+        		this.tickables.resolve.push(tickable.tick.bind(tickable));
+        	} else {
+        		this.tickables.resolve.push(tickable);
+        	}
+        };
+        this.registerOutputTickable = function (tickable) {
+        	if (typeof tickable === 'object') {
+        		this.tickables.output.push(tickable.tick.bind(tickable));
+        	} else {
+        		this.tickables.output.push(tickable);
+        	}
         };
         this.tick = function () {
             if (this.ticking) {
+            	console.log('previous tick not finished!');
                 return;
             }
             this.ticking = true;
             var i;
-            for (i = 0; i < this.tickables.length; i++) {
-                this.tickables[i].tick(this.tickDelta);
+            for (i = 0; i < this.tickables.input.length; i++) {
+                this.tickables.input[i](this.tickDelta);
+            }
+            for (i = 0; i < this.tickables.move.length; i++) {
+                this.tickables.move[i](this.tickDelta);
+            }
+            for (i = 0; i < this.tickables.resolve.length; i++) {
+                this.tickables.resolve[i](this.tickDelta);
+            }
+            for (i = 0; i < this.tickables.output.length; i++) {
+                this.tickables.output[i](this.tickDelta);
             }
             this.ticking = false;
         };
@@ -42,14 +82,25 @@
         this.order = 'go'; // or 'reverse'
         this.minForwardView = 0;
         this.forwardViewTime = 2;
+        this.remotes = {};
         this.elementSignal = {
             direction: 1,
             swaped: function (elm) {
-                if (elm.signal && elm.direction === this.direction) {
-                    if (elm.signal() === 'stop') {
-                        train.command = 'brake';
-                    }
-                }
+            	if (elm.direction === this.direction) {
+	                if (elm.signal) {
+	                    if (elm.signal() === 'stop') {
+	                        train.command = 'brake';
+	                    }
+	                }
+	                if (elm.label && elm.setPosition && train.remotes[elm.label]) {
+	                	elm.setPosition(train.remotes[elm.label]);
+	                }
+	                if (elm.label && elm.getPosition && train.remotes[elm.label]) {
+	                	if (elm.getPosition() !== train.remotes[elm.label]) {
+	                		train.command = 'brake';
+	                	}
+	                }
+            	}
             },
             upped: function (elm) {
                 train.command = 'brake';

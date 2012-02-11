@@ -111,16 +111,12 @@ train2.minForwardView = 200;
 
 builder.namedSwitches['sw1'].toggle();
 
-drawer.tick = function () {
-    trainSimulator.sortElements();
-    this.redraw();
-};
-
 var ticker = new TrainSimulator.Ticker();
 ticker.tickDelta = 0.05;
-ticker.registerTickable(train1);
-ticker.registerTickable(train2);
-ticker.registerTickable(drawer);
+ticker.registerMoveTickable(train1);
+ticker.registerMoveTickable(train2);
+ticker.registerResolveTickable(trainSimulator);
+ticker.registerOutputTickable(drawer);
 ticker.run();
 
         </script>

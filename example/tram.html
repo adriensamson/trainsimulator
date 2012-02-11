@@ -112,22 +112,14 @@ var revertElement = function (track, position) {
 revertElement(builder.namedTracks['end-top'], 150);
 revertElement(builder.namedTracks['start-bottom'], 150);
 
-trainSimulator.sortElements();
-drawer.redraw();
-trainSimulator.sortElements();
-
-drawer.tick = function () {
-    trainSimulator.sortElements();
-    drawer.redraw();
-};
-
 var ticker = new TrainSimulator.Ticker();
 ticker.tickDelta = 0.05;
-ticker.registerTickable(train1);
-ticker.registerTickable(train2);
-ticker.registerTickable(train3);
-ticker.registerTickable(train4);
-ticker.registerTickable(drawer);
+ticker.registerMoveTickable(train1);
+ticker.registerMoveTickable(train2);
+ticker.registerMoveTickable(train3);
+ticker.registerMoveTickable(train4);
+ticker.registerResolveTickable(trainSimulator);
+ticker.registerOutputTickable(drawer);
 ticker.run();
 
         </script>
