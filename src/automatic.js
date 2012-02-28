@@ -78,8 +78,12 @@
         this.accel = 0;
         this.brakingAccel = 0;
         this.maxSpeed = 0;
-        this.command = 'brake'; // or 'accelerate'
-        this.order = 'go'; // or 'reverse'
+        this.slowSpeed = 0;
+        this.command = 'brake'; // brake/slow/accelerate
+        this.order = 'go'; //  go/stop/reverse/wait
+        this.lastStation;
+        this.waitingTime = 1;
+        this.waitingTime = 1;
         this.minForwardView = 0;
         this.forwardViewTime = 2;
         this.remotes = {};
@@ -100,6 +104,14 @@
 	                		train.command = 'brake';
 	                	}
 	                }
+	                if (elm.label && elm.label.match(/^st-/) && elm.label !== train.lastStation) {
+	                	if (train.speed > train.slowSpeed) {
+	                		train.command = 'slow';
+	                	} else {
+		                	train.order = 'wait';
+		                	train.lastStation = elm.label;
+	                	}
+	                }
             	}
             },
             upped: function (elm) {
@@ -113,6 +125,13 @@
                 if (this.speed > this.maxSpeed) {
                     this.speed = this.maxSpeed;
                 }
+            } else if (train.command === 'slow') {
+        		if (this.speed > this.slowSpeed) {
+        			this.speed -= this.brakingAccel * tickDelta;
+                    if (this.speed < 0) {
+                        this.speed = 0;
+                    }
+        		}
             } else {
                 this.speed -= this.brakingAccel * tickDelta;
                 if (this.speed < 0) {
@@ -153,6 +172,16 @@
                 }
             } else if (this.order === 'stop') {
                 this.command = 'brake';
+            } else if (this.order === 'wait') {
+            	if (this.speed > 0){
+            		this.command = 'brake';
+            	} else if (this.waitingTime > 0) {
+            		this.waitingTime -= tickDelta;
+            	} else {
+            		this.order = 'go';
+            		this.command = 'accelerate';
+            		this.waitingTime = this.waitTime;
+            	}
             }
             
         };

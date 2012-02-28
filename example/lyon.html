@@ -73,7 +73,7 @@ var schema = {
         LyonPieces.curveLeft(),
         LyonPieces.straightL10(),
         LyonPieces.straightL6(),
-        LyonPieces.station({name: 'st-liberte-2', endPoint: 'sw-liberte-1.0'}),
+        LyonPieces.station({name: 'st-liberte-1', endPoint: 'sw-liberte-1.0'}),
         
         LyonPieces.straightL4({startPoint: 'sw-bernard-2.0'}),
         LyonPieces.station({name: 'st-bernard-2'}),
@@ -159,8 +159,10 @@ var schema = {
         LyonPieces.switchLeft2('sw-part-dieu-arr-2', 'sw-part-dieu-arr-2.0', 'sw-part-dieu-2.1', 'sw-part-dieu-arr-1.2'),
         
         LyonPieces.straightL1({startPoint: 'sw-part-dieu-arr-1.1'}),
+        LyonPieces.straightL1({name: 'partdieu-1'}),
         LyonPieces.jointTrack(),
         LyonPieces.straightL1({startPoint: 'sw-part-dieu-arr-2.0'}),
+        LyonPieces.straightL1({name: 'partdieu-2'}),
         LyonPieces.jointTrack(),
         
         LyonPieces.station({name: 'st-part-dieu-1', startPoint: 'sw-part-dieu-1.0'}),
@@ -198,10 +200,21 @@ var schema = {
         LyonPieces.switchRight2c('sw-lafayette-2', 'sw-lafayette-2.0', 'sw-lafayette-2.1', 'sw-lafayette-2.2'),
         
         LyonPieces.station({name: 'st-lafayette-1', startPoint: 'sw-lafayette-1.0'}),
-        LyonPieces.jointTrack(),
+        LyonPieces.straightL1({endPoint: 'sw-lafayette-arr-1.1'}),
         
         LyonPieces.straightSpacing({startPoint: 'sw-lafayette-2.0'}),
         LyonPieces.station({name: 'st-lafayette-2'}),
+        LyonPieces.straightL1({endPoint: 'sw-lafayette-arr-2.0'}),
+        
+        LyonPieces.switchLeft0('sw-lafayette-arr-2', 'sw-lafayette-arr-2.0', 'sw-lafayette-arr-2.1', 'sw-lafayette-arr-2.2'),
+        LyonPieces.switchLeft2('sw-lafayette-arr-1', 'sw-lafayette-arr-1.0', 'sw-lafayette-arr-1.1', 'sw-lafayette-arr-2.2'),
+        
+        LyonPieces.straightL1({startPoint: 'sw-lafayette-arr-1.0'}),
+        LyonPieces.straightL1({name: 'lafayette-1'}),
+        LyonPieces.jointTrack(),
+        
+        LyonPieces.straightL1({startPoint: 'sw-lafayette-arr-2.1'}),
+        LyonPieces.straightL1({name: 'lafayette-2'}),
         LyonPieces.jointTrack(),
         
         /* T3 - T4 */
@@ -221,7 +234,8 @@ var schema = {
         LyonPieces.switchLeft1('sw-vilette-2', 'sw-vilette-2.0', 'sw-vilette-2.1', 'sw-vilette-2.2'),
         LyonPieces.switchLeft1('sw-vilette-3', 'sw-vilette-3.0', 'sw-vilette-1.1', 'sw-vilette-2.2'),
         LyonPieces.straightL1({startPoint: 'sw-vilette-3.0'}),
-        LyonPieces.straightL2(),
+        LyonPieces.straightL1(),
+        LyonPieces.straightL1({name: 'tiroir-vilette'}),
         LyonPieces.jointTrack(),
         
         LyonPieces.straightL10({startPoint: 'sw-vilette-1.0'}),
@@ -240,6 +254,7 @@ var schema = {
         
         LyonPieces.counterCurveLeft({startPoint: 'sw-rx-vilette-3.2'}),
         LyonPieces.station({name: 'st-vilette-rx'}),
+        LyonPieces.straightL1({name: 'vilette-rx'}),
         LyonPieces.jointTrack(),
         
         LyonPieces.straightL10({startPoint: 'sw-rx-vilette-1.0'}),
@@ -253,10 +268,10 @@ var schema = {
         LyonPieces.switchLeft0c('sw-T3T4-2', 'sw-T3T4-2.0', 'sw-T3T4-2.1', 'sw-T3T4-2.2'),
         
         LyonPieces.curveLeft({startPoint: 'sw-T3T4-1.2'}),
-        LyonPieces.curveLeft(),
+        LyonPieces.curveLeft({name: 'T3-1'}),
         LyonPieces.jointTrack(),
         LyonPieces.curveLeft({startPoint: 'sw-T3T4-2.2'}),
-        LyonPieces.curveLeft(),
+        LyonPieces.curveLeft({name: 'T3-2'}),
         LyonPieces.jointTrack(),
         
         LyonPieces.straightSpacing({startPoint: 'sw-T3T4-1.1'}),
@@ -427,8 +442,10 @@ var schema = {
         LyonPieces.switchRight2('sw-venissieux-2', 'sw-venissieux-2.0', 'sw-venissieux-2.1', 'sw-venissieux-1.2'),
         
         LyonPieces.straightL1({startPoint: 'sw-venissieux-1.1'}),
+        LyonPieces.straightL1({name: 'venissieux-1'}),
         LyonPieces.jointTrack(),
         LyonPieces.straightL1({startPoint: 'sw-venissieux-2.0'}),
+        LyonPieces.straightL1({name: 'venissieux-2'}),
         LyonPieces.jointTrack(),
         
         /* T2 -> Jean 23 */
@@ -464,7 +481,7 @@ var schema = {
         LyonPieces.switchRight1('sw-jean23-1-2', 'sw-jean23-1-2.0', 'sw-jean23-1-2.1', 'sw-jean23-1-2.2'),
         LyonPieces.switchSym2('sw-jean23-1-3', 'sw-jean23-1-3.0', 'sw-jean23-1-1.2', 'sw-jean23-1-2.2'),
         LyonPieces.straightL1({startPoint: 'sw-jean23-1-3.0'}),
-        LyonPieces.straightL1(),
+        LyonPieces.straightL1({name: 'tiroir-jean23-1'}),
         LyonPieces.jointTrack(),
         LyonPieces.switchLeft2('sw-jean23-1-1', 'sw-jean23-1-1.0', 'sw-jean23-1-1.1', 'sw-jean23-1-1.2'),
         
@@ -479,7 +496,7 @@ var schema = {
         LyonPieces.switchRight1('sw-jean23-2-2', 'sw-jean23-2-2.0', 'sw-jean23-2-2.1', 'sw-jean23-2-2.2'),
         LyonPieces.switchSym2('sw-jean23-2-3', 'sw-jean23-2-3.0', 'sw-jean23-2-1.2', 'sw-jean23-2-2.2'),
         LyonPieces.straightL1({startPoint: 'sw-jean23-2-3.0'}),
-        LyonPieces.straightL1(),
+        LyonPieces.straightL1({name: 'tiroir-jean23-2'}),
         LyonPieces.jointTrack(),
         LyonPieces.switchLeft2('sw-jean23-2-1', 'sw-jean23-2-1.0', 'sw-jean23-2-1.1', 'sw-jean23-2-1.2'),
         
@@ -489,12 +506,12 @@ var schema = {
         LyonPieces.curveRight(),
         LyonPieces.curveRight(),
         LyonPieces.straightSpacing3(),
-        LyonPieces.straightSpacing(),
+        LyonPieces.straightSpacing({name: 'grangeblanche-1'}),
         LyonPieces.jointTrack(),
         LyonPieces.straightL1({startPoint: 'sw-jean23-2-2.0'}),
         LyonPieces.curveRight(),
         LyonPieces.curveRight(),
-        LyonPieces.curveRight(),
+        LyonPieces.curveRight({name: 'grangeblanche-2'}),
         LyonPieces.jointTrack(),
         
         /* Gallieni -> Perrache */
@@ -552,17 +569,17 @@ var schema = {
         LyonPieces.switchRight2('sw-perrache-arr2-1', 'sw-perrache-arr2-1.0', 'sw-perrache-arr2-1.1', 'sw-perrache-arr2-2.2'),
         
         LyonPieces.straightL1({startPoint: 'sw-perrache-arr2-1.0'}),
-        LyonPieces.curveRight(),
+        LyonPieces.curveRight({name: 'charlemagne-1'}),
         LyonPieces.straightL1(),
         LyonPieces.curveLeft(),
-        LyonPieces.straightL1({name: 'charlemagne-1'}),
+        LyonPieces.straightL1(),
         LyonPieces.jointTrack(),
         
         LyonPieces.straightL1({startPoint: 'sw-perrache-arr2-2.1'}),
-        LyonPieces.curveRight(),
+        LyonPieces.curveRight({name: 'charlemagne-2'}),
         LyonPieces.straightL1(),
         LyonPieces.curveLeft(),
-        LyonPieces.straightL1({name: 'charlemagne-2'}),
+        LyonPieces.straightL1(),
         LyonPieces.jointTrack(),
 
         []
@@ -571,6 +588,14 @@ var schema = {
 var builder = new TrainSimulator.TrainSimulatorBuilder();
 var drawer = new TrainSimulator.CanvasDrawer(document.getElementById('canvas'));
 var trainSimulator = new TrainSimulator.TrainSimulator();
+var controller = new TrainSimulator.Controller(document.getElementById('controller'));
+var ticker = new TrainSimulator.Ticker();
+ticker.tickDelta = 0.1;
+ticker.registerResolveTickable(trainSimulator);
+ticker.registerOutputTickable(drawer);
+ticker.registerInputTickable(controller.tickInput.bind(controller));
+ticker.registerOutputTickable(controller.tickOutput.bind(controller));
+
 builder.build(schema);
 builder.registerToTrainSimulator(trainSimulator);
 builder.registerToDrawer(drawer);
@@ -586,57 +611,67 @@ drawer.gridInfo = {
 };
 //drawer.doGridDrawing = true;
 
-var train1 = new TrainSimulator.AutomaticTrain(35);
-drawer.addTrain(train1);
-train1.putOnTrack(builder.namedTracks['charlemagne-2'], 10, 1);
-train1.maxSpeed = 18;
-train1.accel = 6;
-train1.brakingAccel = 30;
-train1.direction = -1;
-train1.minForwardView = 12;
-train1.order = 'stop';
-train1.remotes = {
-    'perrache-arr1-2-1': '||',
-    'perrache-3-1': '||',
-    'gallieni-2-0': '//',
-    'bernard-2-1': '||',
-    'bernard-2-0': 'S',
-    'gallieni-1-2': '//',
-    'perrache-1-0': '||',
-    'perrache-arr1-1-0': 'S'
-};
-var train2 = new TrainSimulator.AutomaticTrain(35);
-drawer.addTrain(train2);
-train2.putOnTrack(builder.namedTracks['perrache-T2'], 10, 1);
-train2.maxSpeed = 18;
-train2.accel = 6;
-train2.brakingAccel = 30;
-train2.direction = -1;
-train2.minForwardView = 12;
-train2.order = 'stop';
-train2.remotes = {
-	    'perrache-3-2': '|/',
-	    'gallieni-2-0': '||',
-	    'berthelot-2-1': '||',
-	    'berthelot-2-0': 'S',
-	    'gallieni-1-1': '||',
-	    'perrache-1-0': '//'
-	};
-var controller = new TrainSimulator.Controller(document.getElementById('controller'));
-controller.addAutomaticTrain('train-1', train1);
-controller.addAutomaticTrain('train-2', train2);
+var trackName;
+for (trackName in builder.namedTracks) {
+	if (trackName.match(/^st-*/)) {
+		console.log(trackName);
+		var track = builder.namedTracks[trackName];
+		track.addElement({
+			x: 3,
+			direction: -1,
+			swaped: function(){},
+			label: trackName
+		}, 3);
+		track.addElement({
+            x: 48,
+            direction: 1,
+            swaped: function(){},
+            label: trackName
+        }, 3);
+	}
+}
+
+var revertElement = function (track, position) {
+    var element = {
+        x: position,
+        direction: 1,
+        swaped: function(){},
+        upped: function (train) {
+            train.order = 'reverse';
+        }
+    };
+    track.addElement(element, position);
+}
+revertElement(builder.namedTracks['charlemagne-1'], 10);
+revertElement(builder.namedTracks['charlemagne-2'], 10);
+revertElement(builder.namedTracks['perrache-T2'], 10);
+revertElement(builder.namedTracks['tiroir-jean23-1'], 15);
+revertElement(builder.namedTracks['tiroir-jean23-2'], 15);
+revertElement(builder.namedTracks['grangeblanche-1'], 1);
+revertElement(builder.namedTracks['grangeblanche-2'], 10);
+revertElement(builder.namedTracks['venissieux-1'], 15);
+revertElement(builder.namedTracks['venissieux-2'], 15);
+revertElement(builder.namedTracks['partdieu-1'], 15);
+revertElement(builder.namedTracks['partdieu-2'], 15);
+revertElement(builder.namedTracks['lafayette-1'], 15);
+revertElement(builder.namedTracks['lafayette-2'], 15);
+revertElement(builder.namedTracks['T3-1'], 10);
+revertElement(builder.namedTracks['T3-2'], 10);
+revertElement(builder.namedTracks['tiroir-vilette'], 15);
+revertElement(builder.namedTracks['vilette-rx'], 15);
 
 function addReturnSwitchGroup(swname) {
 	var swGroup = new TrainSimulator.SwitchGroupController();
 	swGroup.addSwitch(builder.namedSwitches['sw-'+swname+'-1']);
 	swGroup.addSwitch(builder.namedSwitches['sw-'+swname+'-2']);
-	swGroup.addSignal(swname+'-1-1', 0, 1, 3); swGroup.addBlockEntry(0, 1, 2, 3);
-	swGroup.addSignal(swname+'-2-1', 1, 1, 3); swGroup.addBlockEntry(1, 1, 2, 3);
-	swGroup.addSignal(swname+'-1-0', 0, 0, 3); swGroup.addBlockEntry(0, 0, 2, 3);
-	swGroup.addSignal(swname+'-2-0', 1, 0, 3); swGroup.addBlockEntry(1, 0, 2, 3);
+	swGroup.addSignal(swname+'-1-1', 0, 1, 2); swGroup.addBlockEntry(0, 1, 1, 2);
+	swGroup.addSignal(swname+'-2-1', 1, 1, 2); swGroup.addBlockEntry(1, 1, 1, 2);
+	swGroup.addSignal(swname+'-1-0', 0, 0, 2); swGroup.addBlockEntry(0, 0, 1, 2);
+	swGroup.addSignal(swname+'-2-0', 1, 0, 2); swGroup.addBlockEntry(1, 0, 1, 2);
 	swGroup.addPosition('||', [false, false], [true, true, true, true]);
 	swGroup.addPosition('S', [true, true], [false, false, true, true]);
 	controller.addSwitchGroup(swname, swGroup);
+	ticker.registerInputTickable(swGroup);
 }
 function addTurnSwitchGroup(swname) {
 	var swGroup = new TrainSimulator.SwitchGroupController();
@@ -651,6 +686,7 @@ function addTurnSwitchGroup(swname) {
 	swGroup.addPosition('||', [false, false], [true, false, true, false, true, true]);
 	swGroup.addPosition('//', [true, true], [false, true, false, true, true, true]);
 	controller.addSwitchGroup(swname, swGroup);
+	ticker.registerInputTickable(swGroup);
 }
 function addTiroir22SwitchGroup(swname) {
 	var swGroup = new TrainSimulator.SwitchGroupController();
@@ -666,6 +702,7 @@ function addTiroir22SwitchGroup(swname) {
 	swGroup.addPosition('1', [true, false, false], [false, true, true, true, true]);
 	swGroup.addPosition('2', [false, true, true], [true, false, true, true, true]);
 	controller.addSwitchGroup(swname, swGroup);
+	ticker.registerInputTickable(swGroup);
 }
 function addTiroir12SwitchGroup(swname) {
     var swGroup = new TrainSimulator.SwitchGroupController();
@@ -681,6 +718,7 @@ function addTiroir12SwitchGroup(swname) {
     swGroup.addPosition('1', [false, false, false], [false, true, true, true, true]);
     swGroup.addPosition('2', [true, true, true], [true, false, true, true, true]);
     controller.addSwitchGroup(swname, swGroup);
+    ticker.registerInputTickable(swGroup);
 }
 function addEscapeSwitchGroup(swname) {
 	var swGroup = new TrainSimulator.SwitchGroupController();
@@ -696,6 +734,7 @@ function addEscapeSwitchGroup(swname) {
     swGroup.addPosition('|/', [false, false, true], [true, true, false, true, true]);
     swGroup.addPosition('//', [true, true, true], [false, false, false, true, true]);
     controller.addSwitchGroup(swname, swGroup);
+    ticker.registerInputTickable(swGroup);
 }
 
 addTurnSwitchGroup('gallieni')
@@ -705,6 +744,7 @@ addReturnSwitchGroup('liberte');
 addTurnSwitchGroup('part-dieu')
 addReturnSwitchGroup('part-dieu-arr');
 addTurnSwitchGroup('lafayette')
+addReturnSwitchGroup('lafayette-arr');
 
 addReturnSwitchGroup('berthelot');
 addReturnSwitchGroup('villon');
@@ -729,19 +769,107 @@ t2t4.addSignal('t4t2', 1, 0, 3); t2t4.addBlockEntry(1, 0, 2, 3);
 t2t4.addPosition('off', [false, false], [true, true, true, true]);
 t2t4.addPosition('on', [true, true], [false, false, true, true]);
 controller.addSwitchGroup('t2t4', t2t4);
+ticker.registerInputTickable(t2t4);
 
 addTiroir22SwitchGroup('jean23-1');
 addTiroir22SwitchGroup('jean23-2');
 addTiroir12SwitchGroup('vilette');
 
-var ticker = new TrainSimulator.Ticker();
-ticker.tickDelta = 0.1;
-ticker.registerMoveTickable(train1);
-ticker.registerMoveTickable(train2);
-ticker.registerResolveTickable(trainSimulator);
-ticker.registerOutputTickable(drawer);
-ticker.registerInputTickable(controller.tickInput.bind(controller));
-ticker.registerOutputTickable(controller.tickOutput.bind(controller));
+var trainCounter = 0;
+function addT1(trackName, position, direction) {
+	var train1 = new TrainSimulator.AutomaticTrain(35);
+    drawer.addTrain(train1);
+    train1.putOnTrack(builder.namedTracks[trackName], position, direction);
+    train1.maxSpeed = 18;
+    train1.slowSpeed = 6;
+    train1.accel = 6;
+    train1.brakingAccel = 30;
+    train1.direction = -1;
+    train1.minForwardView = 10;
+    train1.order = 'go';
+    train1.remotes = {
+        'perrache-arr1-2-0': '||',
+        'perrache-3-1': '||',
+        'gallieni-2-0': '//',
+        'part-dieu-2-2': '//',
+        'lafayette-2-2': '//',
+        'lafayette-arr-2-0': 'S',
+        'lafayette-arr-1-0': '||',
+        'lafayette-1-0': '//',
+        'part-dieu-1-0': '//',
+        'gallieni-1-2': '//',
+        'perrache-1-0': '||',
+        'perrache-arr1-1-0': 'S'
+    };
+    trainCounter++;
+    controller.addAutomaticTrain('T1-'+trainCounter, train1);
+    ticker.registerMoveTickable(train1);
+}
+
+
+function addT2(trackName, position, direction) {
+    var train2 = new TrainSimulator.AutomaticTrain(35);
+    drawer.addTrain(train2);
+    train2.putOnTrack(builder.namedTracks[trackName], position, direction);
+    train2.maxSpeed = 18;
+    train2.slowSpeed = 6;
+    train2.accel = 6;
+    train2.brakingAccel = 30;
+    train2.direction = -1;
+    train2.minForwardView = 10;
+    train2.order = 'go';
+    train2.remotes = {
+        'perrache-3-2': '|/',
+        'gallieni-2-0': '||',
+        'jean23-2-2-1': '||',
+        'jean23-2-2-0': '2',
+        'jean23-2-3-0': '1',
+        'jean23-2-1-0': '||',
+        'gallieni-1-1': '||',
+        'perrache-1-0': '//'
+    };
+    trainCounter++;
+    controller.addAutomaticTrain('T2-'+trainCounter, train2);
+    ticker.registerMoveTickable(train2);
+}
+
+addT1('charlemagne-2', 10, 1);
+addT1('st-perrache-2', 45, 1);
+addT1('st-bernard-2', 5, -1);
+addT1('st-universite-2', 5, -1);
+addT1('st-st-andre-2', 5, -1);
+addT1('st-guillotiere-2', 5, -1);
+addT1('st-liberte-2', 5, -1);
+addT1('st-prefecture-2', 5, -1);
+addT1('st-palais-justice-2', 5, -1);
+addT1('st-servient-2', 5, -1);
+addT1('st-part-dieu-2', 5, -1);
+addT1('st-lafayette-2', 5, -1);
+addT1('st-lafayette-1', 45, 1);
+addT1('st-part-dieu-1', 45, 1);
+addT1('st-servient-1', 45, 1);
+addT1('st-palais-justice-1', 45, 1);
+addT1('st-prefecture-1', 45, 1);
+addT1('st-liberte-1', 45, 1);
+addT1('st-guillotiere-1', 45, 1);
+addT1('st-st-andre-1', 45, 1);
+addT1('st-universite-1', 45, 1);
+addT1('st-bernard-1', 45, 1);
+addT1('st-perrache-1', 5, -1);
+
+addT2('perrache-T2', 10, 1);
+addT2('st-berthelot-2', 5, -1);
+addT2('st-jean-mace-2', 5, -1);
+addT2('st-garibaldi-2', 5, -1);
+addT2('st-vienne-2', 5, -1);
+addT2('st-mendes-T2-2', 5, -1);
+addT2('st-mendes-T2-1', 45, 1);
+addT2('st-vienne-1', 45, 1);
+addT2('st-garibaldi-1', 45, 1);
+addT2('st-jean-mace-1', 45, 1);
+addT2('st-berthelot-1', 45, 1);
+
+
 ticker.run();
 
         </script>

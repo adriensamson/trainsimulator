@@ -264,7 +264,7 @@ var TrainSimulator = {};
 
     ts.Detector = function () {
         this.hoverCount = 0;
-        this.putOnTrack = function (track, position) {
+        this.putOnTrack = function (track, position, fromPosition) {
             var detector = this;
             this.element = {
                 x: position,
@@ -277,7 +277,7 @@ var TrainSimulator = {};
                 },
                 swaped: function (){}
             };
-            track.addElement(this.element, position);
+            track.addElement(this.element, fromPosition);
         };
         this.isUp = function () {
             return this.hoverCount > 0;
@@ -289,9 +289,9 @@ var TrainSimulator = {};
         this.signals = [];
         this.inCount = 0;
         var block = this;
-        this.addEntry = function (track, outerPosition, innerPosition) {
+        this.addEntry = function (track, outerPosition, innerPosition, fromPosition) {
             var innerDetector = new ts.Detector();
-            innerDetector.putOnTrack(track, innerPosition);
+            innerDetector.putOnTrack(track, innerPosition, fromPosition);
             var outerElement = {
                 x: outerPosition,
                 direction: 1,
@@ -307,7 +307,7 @@ var TrainSimulator = {};
                 },
                 swaped: function(){}
             };
-            track.addElement(outerElement, outerPosition);
+            track.addElement(outerElement, fromPosition);
             this.entries[this.entries.length] = {innerDetector: innerDetector, outer: outerElement};
         };
         this.addSignal = function (track, position, direction) {

@@ -5,6 +5,7 @@
     	this.switches = [];
     	this.signals = [];
     	this.positions = {};
+    	this.askedPosition = undefined;
     	this.block = new ts.Block();
     	
     	this.addSwitch = function (sw) {
@@ -19,7 +20,7 @@
                 direction: trackInfo.direction,
                 label: label,
                 signal: function() {
-                    if (!this.isOpen || controller.block.isBusy()) {
+                    if (!this.isOpen) {
                         return 'stop';
                     } else {
                         return 'go';
@@ -43,7 +44,7 @@
     	
     	this.addBlockEntry = function (swNum, trackNum, innerDist, outerDist) {
     		var trackInfo = this.switches[swNum].tracks[trackNum];
-    		this.block.addEntry(trackInfo.track, trackInfo.position - trackInfo.direction * outerDist, trackInfo.position - trackInfo.direction * innerDist);
+    		this.block.addEntry(trackInfo.track, trackInfo.position - trackInfo.direction * outerDist, trackInfo.position - trackInfo.direction * innerDist, trackInfo.position);
     	};
     	
     	this.addPosition = function (name, positions, signals) {
@@ -51,10 +52,16 @@
     	};
     	
     	this.setPosition = function (name) {
-    		if (this.block.isBusy()) {
+    		if (this.block.isBusy() || this.askedPosition !== undefined) {
     			return;
     		}
-    		var position = this.positions[name];
+    		this.askedPosition = name;
+    	};
+		this.tick = function () {
+			if (this.askedPosition === undefined) {
+				return;
+			}
+    		var position = this.positions[this.askedPosition];
     		if (position) {
     			var i;
     			for (i = 0; i < position.positions.length; i++) {
@@ -66,6 +73,7 @@
     					this.signals[i].isOpen = position.signals[i];
 				}
     		}
+    		this.askedPosition = undefined;
     	};
     	
     	this.getPosition = function () {
@@ -173,6 +181,7 @@
     		addOption('go');
     		addOption('stop');
     		addOption('reverse');
+    		addOption('wait');
     		var selected = trainLi.querySelector('input[value="'+train.order+'"]');
     		if (selected) {
 				selected.checked = true;
