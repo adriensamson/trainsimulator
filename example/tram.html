@@ -99,15 +99,11 @@ for (var swname in builder.namedSwitches) {
 }
 
 var revertElement = function (track, position) {
-    var element = {
-        x: position,
-        direction: 1,
-        swaped: function(){},
-        upped: function (train) {
-            train.order = 'reverse';
-        }
+    var element = new TrainSimulator.Element();
+    element.upped = function (train) {
+        train.order = 'reverse';
     };
-    track.addElement(element, position);
+    element.putOnTrack(track, position, 1);
 }
 revertElement(builder.namedTracks['end-top'], 150);
 revertElement(builder.namedTracks['start-bottom'], 150);

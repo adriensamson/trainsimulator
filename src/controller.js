@@ -15,30 +15,26 @@
     	this.addSignal = function (label, swNum, trackNum, dist) {
     		var trackInfo = this.switches[swNum].tracks[trackNum];
     		var controller = this;
-    		var signalElement = {
-                x: trackInfo.position - trackInfo.direction * dist,
-                direction: trackInfo.direction,
-                label: label,
-                signal: function() {
-                    if (!this.isOpen) {
-                        return 'stop';
-                    } else {
-                        return 'go';
-                    }
-                },
-                getPosition: function() {
-                    return controller.getPosition();
-                },
-                getAvailablePositions: function() {
-                    return controller.positions;
-                },
-                setPosition: function(pos) {
-            		controller.setPosition(pos);
-                },
-                swaped: function (){},
-                isOpen: false
+    		var signalElement = new ts.Element();
+    		signalElement.label = label;
+    		signalElement.signal = function() {
+                if (!this.isOpen) {
+                    return 'stop';
+                } else {
+                    return 'go';
+                }
             };
-    		trackInfo.track.addElement(signalElement, signalElement.x);
+            signalElement.getControllerPosition = function() {
+                return controller.getPosition();
+            };
+            signalElement.getControllerAvailablePositions = function() {
+                return controller.positions;
+            };
+            signalElement.setControllerPosition = function(pos) {
+        		controller.setPosition(pos);
+            };
+            signalElement.isOpen = false;
+    		signalElement.putOnTrack(trackInfo.track, trackInfo.position - trackInfo.direction * dist, trackInfo.direction);
     		this.signals.push(signalElement);
     	};
     	

@@ -83,43 +83,42 @@
         this.order = 'go'; //  go/stop/reverse/wait
         this.lastStation;
         this.waitingTime = 1;
-        this.waitingTime = 1;
+        this.waitTime = 1;
         this.minForwardView = 0;
         this.forwardViewTime = 2;
         this.remotes = {};
-        this.elementSignal = {
-            direction: 1,
-            swaped: function (elm) {
-            	if (elm.direction === this.direction) {
-	                if (elm.signal) {
-	                    if (elm.signal() === 'stop') {
-	                        train.command = 'brake';
-	                    }
-	                }
-	                if (elm.label && elm.setPosition && train.remotes[elm.label]) {
-	                	elm.setPosition(train.remotes[elm.label]);
-	                }
-	                if (elm.label && elm.getPosition && train.remotes[elm.label]) {
-	                	if (elm.getPosition() !== train.remotes[elm.label]) {
-	                		train.command = 'brake';
-	                	}
-	                }
-	                if (elm.label && elm.label.match(/^st-/) && elm.label !== train.lastStation) {
-	                	if (train.speed > train.slowSpeed) {
-	                		train.command = 'slow';
-	                	} else {
-		                	train.order = 'wait';
-		                	train.lastStation = elm.label;
-	                	}
-	                }
-            	}
-            },
-            upped: function (elm) {
-                train.command = 'brake';
-            }
+        this.elementSignal = new ts.Element();
+        this.elementSignal.swaped = function (elm) {
+        	if (elm.getDirection() === this.getDirection()) {
+                if (elm.signal) {
+                    if (elm.signal() === 'stop') {
+                        train.command = 'brake';
+                    }
+                }
+                if (elm.label && elm.setControllerPosition && train.remotes[elm.label]) {
+                	elm.setControllerPosition(train.remotes[elm.label]);
+                }
+                if (elm.label && elm.getControllerPosition && train.remotes[elm.label]) {
+                	if (elm.getControllerPosition() !== train.remotes[elm.label]) {
+                		train.command = 'brake';
+                	}
+                }
+                if (elm.label && elm.label.match(/^st-/) && elm.label !== train.lastStation) {
+                	if (train.speed > train.slowSpeed) {
+                	    if (train.command !== 'brake') {
+                	        train.command = 'slow';
+                	    }
+                	} else {
+	                	train.order = 'wait';
+	                	train.lastStation = elm.label;
+                	}
+                }
+        	}
+        };
+        this.elementSignal.upped = function () {
+            train.command = 'brake';
         };
         this.tick = function (tickDelta) {
-            var fromPosition;
             if (train.command === 'accelerate') {
                 this.speed += this.accel * tickDelta;
                 if (this.speed > this.maxSpeed) {
@@ -139,8 +138,8 @@
                 }
             }
             
-            if (this.elementSignal.track) {
-                this.elementSignal.track.removeElement(this.elementSignal);
+            if (this.elementSignal.getTrack()) {
+                this.elementSignal.removeFromTrack();
             }
             
             var forwardView = this.speed * this.forwardViewTime;
@@ -149,13 +148,15 @@
             }
             
             if (this.direction > 0) {
-                this.elementSignal.direction = this.elementHead.direction;
-                this.elementSignal.x = this.elementHead.x + forwardView * this.elementSignal.direction + this.direction * this.speed * tickDelta;
-                this.elementHead.track.addElement(this.elementSignal, this.elementHead.x);
+                this.elementSignal.putOnTrack(this.elementHead.getTrack(),
+                        this.elementHead.getPosition() + forwardView * this.elementHead.getDirection() + this.direction * this.speed * tickDelta,
+                        this.elementHead.getDirection(),
+                        this.elementHead.getPosition());
             } else {
-                this.elementSignal.direction = this.elementTail.direction;
-                this.elementSignal.x = this.elementTail.x + forwardView * this.elementSignal.direction + this.direction * this.speed * tickDelta;
-                this.elementTail.track.addElement(this.elementSignal, this.elementTail.x);
+                this.elementSignal.putOnTrack(this.elementTail.getTrack(),
+                        this.elementTail.getPosition() + forwardView * this.elementTail.getDirection() - this.direction * this.speed * tickDelta,
+                        this.elementTail.getDirection(),
+                        this.elementTail.getPosition());
             }
             
             this.move(this.direction * this.speed * tickDelta);

@@ -616,31 +616,21 @@ for (trackName in builder.namedTracks) {
 	if (trackName.match(/^st-*/)) {
 		console.log(trackName);
 		var track = builder.namedTracks[trackName];
-		track.addElement({
-			x: 3,
-			direction: -1,
-			swaped: function(){},
-			label: trackName
-		}, 3);
-		track.addElement({
-            x: 48,
-            direction: 1,
-            swaped: function(){},
-            label: trackName
-        }, 3);
+		var element = new TrainSimulator.Element();
+		element.label = trackName;
+		element.putOnTrack(track, 3, -1);
+		var element = new TrainSimulator.Element();
+        element.label = trackName;
+        element.putOnTrack(track, 48, 1);
 	}
 }
 
 var revertElement = function (track, position) {
-    var element = {
-        x: position,
-        direction: 1,
-        swaped: function(){},
-        upped: function (train) {
-            train.order = 'reverse';
-        }
+    var element = new TrainSimulator.Element();
+    element.upped = function (train) {
+        train.order = 'reverse';
     };
-    track.addElement(element, position);
+    element.putOnTrack(track, position, 1);
 }
 revertElement(builder.namedTracks['charlemagne-1'], 10);
 revertElement(builder.namedTracks['charlemagne-2'], 10);

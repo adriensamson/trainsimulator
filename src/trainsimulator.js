@@ -28,37 +28,100 @@ var TrainSimulator = {};
             return newObject;
         }
     };
+    
+    ts.Element = function () {
+    	var track = undefined;
+    	var position = 0;
+    	var direction = 1;
+    	
+    	this.putOnTrack = function (newTrack, newPosition, newDirection, fromPosition) {
+    	    if (track !== undefined) {
+    	        throw "already on track";
+    	    }
+    	    position = newPosition;
+    	    track = newTrack;
+    	    direction = newDirection;
+    	    if (fromPosition === undefined) {
+    	        fromPosition = newPosition;
+    	    }
+    	    newTrack.addElement(this, fromPosition);
+    	};
+    	this.removeFromTrack = function () {
+    	    if (track === undefined) {
+                throw "not on track";
+            }
+    	    track.removeElement(this);
+    	    track = undefined;
+    	};
+    	
+    	this.getTrack = function () {
+    	    return track;
+    	};
+    	this.getPosition = function () {
+    	    return position;
+    	};
+    	
+    	this.getDirection = function () {
+    	    return direction;
+    	};
+    	
+    	this.move = function (distance) {
+    	    position += distance;
+    	    track.notifyMove();
+    	};
+    	
+    	this.moveToTrack = function (fromPosition, newTrack, newPosition, directionCoeff) {
+    	    var oldTrack = track;
+    	    var oldPosition = position;
+    	    track.removeElement(this);
+            position = newPosition + directionCoeff * (oldPosition - fromPosition);
+            track = newTrack;
+            direction *= directionCoeff;
+            newTrack.addElement(this, newPosition);
+            this.addPartition({removedTrack: oldTrack, removedPosition: fromPosition, addedTrack: newTrack, addedPosition: newPosition});
+    	};
+    };
+    ts.Element.prototype.swaped = function () {};
+    ts.Element.prototype.addPartition = function () {};
+    
 
     ts.Track = function () {
-        this.elements = [];
+        var elements = [];
+        var sorted = true;
+        
         this.addElement = function (elm, fromPosition) {
-            var toPosition = elm.x,
+            var toPosition = elm.getPosition(),
                 i = 0;
-            while (i < this.elements.length &&
-                    this.elements[i].x < fromPosition) {
+            while (i < elements.length &&
+                    elements[i].getPosition() < fromPosition) {
                 i++;
             }
-            if (i < this.elements.length && this.elements[i].x === fromPosition && toPosition > fromPosition) {
+            if (i < elements.length && elements[i].getPosition() === fromPosition && toPosition > fromPosition) {
                 i++;
             }
-            this.elements.splice(i, 0, elm);
-            elm.track = this;
+            elements.splice(i, 0, elm);
+        };
+        this.notifyMove = function () {
+            sorted = false;
         };
         this.removeElement = function (elm) {
-            this.elements.splice(this.elements.indexOf(elm), 1);
-            elm.track = null;
+            elements.splice(elements.indexOf(elm), 1);
         };
         this.sortElements = function () {
-            var sorted = true, alreadySorted = true;
+            if (sorted) {
+                return true;
+            }
+            sorted = true;
+            var alreadySorted = true;
             var i, first, second;
-            for (i = 0; i < this.elements.length - 1; i++) {
-                if (this.elements[i].x > this.elements[i+1].x) {
+            for (i = 0; i < elements.length - 1; i++) {
+                if (elements[i].getPosition() > elements[i+1].getPosition()) {
                     sorted = false;
                     // swap
-                    first = this.elements[i];
-                    second = this.elements[i+1];
-                    this.elements[i] = second;
-                    this.elements[i+1] = first;
+                    first = elements[i];
+                    second = elements[i+1];
+                    elements[i] = second;
+                    elements[i+1] = first;
                     // notify
                     first.swaped(second);
                     second.swaped(first);
@@ -69,6 +132,20 @@ var TrainSimulator = {};
                 this.sortElements();
             }
             return alreadySorted;
+        };
+        this.getMinPosition = function () {
+            if (elements.length > 0) {
+                return elements[0].getPosition();
+            } else {
+                return 0;
+            }
+        };
+        this.getMaxPosition = function () {
+            if (elements.length > 0) {
+                return elements[elements.length - 1].getPosition();
+            } else {
+                return 0;
+            }
         };
     };
 
@@ -81,26 +158,18 @@ var TrainSimulator = {};
                 direction: direction > 0 ? 1 : -1
             };
             var joint = this;
-            var element = {
-                x: position,
-                swaped: function(elm) {
-                    if (direction > 0 && elm.x > this.x ||
-                        direction < 0 && elm.x < this.x
-                    ) {
-                        var newTrackNum = num === 1 ? 0 : 1;
-                        var newTrack = joint.tracks[newTrackNum];
-                        var coeff = -1 * joint.tracks[num].direction * joint.tracks[newTrackNum].direction;
-                        elm.x = newTrack.position + coeff * (elm.x - this.x);
-                        elm.direction *= coeff;
-                        track.removeElement(elm);
-                        newTrack.track.addElement(elm, newTrack.position);
-                        if (elm.addPartition) {
-                            elm.addPartition({removedTrack: track, removedPosition: position, addedTrack: newTrack.track, addedPosition: newTrack.position});
-                        }
-                    }
+            var element = new ts.Element();
+            element.swaped = function(elm) {
+                if (direction > 0 && elm.getPosition() > this.getPosition() ||
+                    direction < 0 && elm.getPosition() < this.getPosition()
+                ) {
+                    var newTrackNum = num === 1 ? 0 : 1;
+                    var newTrack = joint.tracks[newTrackNum];
+                    var coeff = -1 * joint.tracks[num].direction * joint.tracks[newTrackNum].direction;
+                    elm.moveToTrack(this.getPosition(), newTrack.track, newTrack.position, coeff);
                 }
             };
-            track.addElement(element, position);
+            element.putOnTrack(track, position, direction);
         };
     };
 
@@ -132,26 +201,18 @@ var TrainSimulator = {};
                 direction: direction > 0 ? 1 : -1
             };
             var joint = this;
-            var element = {
-                x: position,
-                swaped: function(elm) {
-                    if (direction > 0 && elm.x > this.x ||
-                        direction < 0 && elm.x < this.x
-                    ) {
-                        var newTrackNum = joint.nextTrack(num);
-                        var newTrack = joint.tracks[newTrackNum];
-                        var coeff = -1 * joint.tracks[num].direction * joint.tracks[newTrackNum].direction;
-                        elm.x = newTrack.position + coeff * (elm.x - this.x);
-                        elm.direction *= coeff;
-                        track.removeElement(elm);
-                        newTrack.track.addElement(elm, newTrack.position);
-                        if (elm.addPartition) {
-                            elm.addPartition({removedTrack: track, removedPosition: position, addedTrack: newTrack.track, addedPosition: newTrack.position});
-                        }
-                    }
+            var element = new ts.Element();
+            element.swaped = function(elm) {
+                if (direction > 0 && elm.getPosition() > this.getPosition() ||
+                    direction < 0 && elm.getPosition() < this.getPosition()
+                ) {
+                    var newTrackNum = joint.nextTrack(num);
+                    var newTrack = joint.tracks[newTrackNum];
+                    var coeff = -1 * joint.tracks[num].direction * joint.tracks[newTrackNum].direction;
+                    elm.moveToTrack(this.getPosition(), newTrack.track, newTrack.position, coeff);
                 }
             };
-            track.addElement(element, position);
+            element.putOnTrack(track, position, direction);
         };
         this.addBlock = function (innerDist, outerDist) {
             this.block = new ts.Block();
@@ -170,61 +231,61 @@ var TrainSimulator = {};
         this.putOnTrack = function (track, position, direction) {
             var train = this;
             var tailPosition = position - direction * size;
-            this.elementHead = {
-                x: position,
-                direction: direction,
-                swaped: function (elm) {
-                    if (train.isOnElm(elm)) {
-                        if (elm.upped) {
-                            elm.upped(train);
-                        }
-                    } else {
-                        if (elm.downed) {
-                            elm.downed(train);
-                        }
+            this.elementHead = new ts.Element();
+            this.elementHead.swaped = function (elm) {
+                if (train.isOnElm(elm)) {
+                    if (elm.upped) {
+                        elm.upped(train);
                     }
-                },
-                addPartition: function (partition) {
-                    if (train.trackPartitions.length > 0 && ts.Utils.partitionEquals(train.trackPartitions[0], partition)) {
-                        train.trackPartitions.splice(0, 1);
-                    } else {
-                        train.trackPartitions.splice(0, 0, partition);
+                } else {
+                    if (elm.downed) {
+                        elm.downed(train);
                     }
                 }
             };
-            track.addElement(this.elementHead, position);
-            this.elementTail = {
-                x: tailPosition,
-                direction: -direction,
-                swaped: function (elm) {
-                   if (train.isOnElm(elm)) {
-                        if (elm.upped) {
-                            elm.upped(train);
-                        }
-                    } else {
-                        if (elm.downed) {
-                            elm.downed(train);
-                        }
+            this.elementHead.upped = function () {
+                console.warn('colision');
+            };
+            this.elementHead.addPartition = function (partition) {
+                if (train.trackPartitions.length > 0 && ts.Utils.partitionEquals(train.trackPartitions[0], partition)) {
+                    train.trackPartitions.splice(0, 1);
+                } else {
+                    train.trackPartitions.splice(0, 0, partition);
+                }
+            };
+            this.elementHead.putOnTrack(track, position, direction);
+
+            this.elementTail = new ts.Element();
+            this.elementTail.swaped = function (elm) {
+               if (train.isOnElm(elm)) {
+                    if (elm.upped) {
+                        elm.upped(train);
                     }
-                },
-                addPartition: function (partition) {
-                    if (train.trackPartitions.length > 0 && ts.Utils.partitionEquals(train.trackPartitions[train.trackPartitions.length - 1], partition)) {
-                        train.trackPartitions.splice(train.trackPartitions.length - 1, 1);
-                    } else {
-                        train.trackPartitions.splice(train.trackPartitions.length, 0, partition);
+                } else {
+                    if (elm.downed) {
+                        elm.downed(train);
                     }
                 }
             };
-            track.addElement(this.elementTail, position);
-            track.sortElements();
+            this.elementTail.upped = function () {
+                console.warn('colision');
+            };
+            this.elementTail.addPartition = function (partition) {
+                if (train.trackPartitions.length > 0 && ts.Utils.partitionEquals(train.trackPartitions[train.trackPartitions.length - 1], partition)) {
+                    train.trackPartitions.splice(train.trackPartitions.length - 1, 1);
+                } else {
+                    train.trackPartitions.splice(train.trackPartitions.length, 0, partition);
+                }
+            };
+            this.elementTail.putOnTrack(track, tailPosition, -direction, position);
         };
         this.move = function (dist) {
-            this.elementHead.x += this.elementHead.direction * dist;
-            this.elementTail.x -= this.elementTail.direction * dist;
+            this.elementHead.move(this.elementHead.getDirection() * dist);
+            this.elementTail.move(-this.elementTail.getDirection() * dist);
         };
         this.getTrackParts = function() {
             var parts = [];
-            var newPart = {track: this.elementHead.track, from: this.elementHead.x};
+            var newPart = {track: this.elementHead.getTrack(), from: this.elementHead.getPosition()};
             var i;
             for (i = 0; i < this.trackPartitions.length; i++) {
                 var partition = this.trackPartitions[i];
@@ -240,7 +301,7 @@ var TrainSimulator = {};
                     console.warn('getTrackParts: no corresponding track');
                 }
             }
-            newPart.to = this.elementTail.x;
+            newPart.to = this.elementTail.getPosition();
             parts[parts.length] = newPart;
             return parts;
         };
@@ -249,10 +310,10 @@ var TrainSimulator = {};
             var i, trackPart;
             for (i = 0; i < trackParts.length; i++) {
                 trackPart = trackParts[i];
-                if (trackPart.track === elm.track) {
-                    if (trackPart.from < elm.x && elm.x <= trackPart.to ||
-                        trackPart.to < elm.x && elm.x <= trackPart.from ||
-                        i !== 0 && i !== trackParts.length - 1 && (trackPart.from === elm.x && trackPart.to === elm.x)
+                if (trackPart.track === elm.getTrack()) {
+                    if (trackPart.from < elm.getPosition() && elm.getPosition() <= trackPart.to ||
+                        trackPart.to < elm.getPosition() && elm.getPosition() <= trackPart.from ||
+                        i !== 0 && i !== trackParts.length - 1 && (trackPart.from === elm.getPosition() && trackPart.to === elm.getPosition())
                     ) {
                         return true;
                     }
@@ -266,18 +327,14 @@ var TrainSimulator = {};
         this.hoverCount = 0;
         this.putOnTrack = function (track, position, fromPosition) {
             var detector = this;
-            this.element = {
-                x: position,
-                direction: 1,
-                upped: function (train) {
-                    detector.hoverCount += 1;
-                },
-                downed: function (train) {
-                    detector.hoverCount -= 1;
-                },
-                swaped: function (){}
+            this.element = new ts.Element();
+            this.element.upped = function (train) {
+                detector.hoverCount += 1;
             };
-            track.addElement(this.element, fromPosition);
+            this.element.downed = function (train) {
+                detector.hoverCount -= 1;
+            };
+            this.element.putOnTrack(track, position, 1, fromPosition);
         };
         this.isUp = function () {
             return this.hoverCount > 0;
@@ -291,39 +348,31 @@ var TrainSimulator = {};
         var block = this;
         this.addEntry = function (track, outerPosition, innerPosition, fromPosition) {
             var innerDetector = new ts.Detector();
-            innerDetector.putOnTrack(track, innerPosition, fromPosition);
-            var outerElement = {
-                x: outerPosition,
-                direction: 1,
-                upped: function (train) {
-                    if (!innerDetector.isUp()) {
-                        block.inCount++;
-                    }
-                },
-                downed: function (train) {
-                    if (!innerDetector.isUp()) {
-                        block.inCount--;
-                    }
-                },
-                swaped: function(){}
+            innerDetector.putOnTrack(track, innerPosition, 1, fromPosition);
+            var outerElement = new ts.Element();
+            outerElement.upped = function (train) {
+                if (!innerDetector.isUp()) {
+                    block.inCount++;
+                }
             };
-            track.addElement(outerElement, fromPosition);
+            outerElement.downed = function (train) {
+                if (!innerDetector.isUp()) {
+                    block.inCount--;
+                }
+            };
+            outerElement.putOnTrack(track, outerPosition, 1, fromPosition);
             this.entries[this.entries.length] = {innerDetector: innerDetector, outer: outerElement};
         };
         this.addSignal = function (track, position, direction) {
-            var signalElement = {
-                x: position,
-                direction: direction,
-                signal: function() {
-                    if (block.isBusy()) {
-                        return 'stop';
-                    } else {
-                        return 'go';
-                    }
-                },
-                swaped: function (){}
+            var signalElement = new ts.Element();
+            signalElement.signal = function() {
+                if (block.isBusy()) {
+                    return 'stop';
+                } else {
+                    return 'go';
+                }
             };
-            track.addElement(signalElement, position);
+            signalElement.putOnTrack(track, position, direction);
             this.signals.push(signalElement);
         };
         this.isBusy = function () {

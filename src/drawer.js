@@ -83,8 +83,8 @@
                 if (track.color !== undefined) {
                 	ctx.strokeStyle = 'rgba('+track.color.r+','+track.color.g+','+track.color.b+',0.3)';
                 }
-                var from = track.elements[0].x;
-                var to = track.elements[track.elements.length - 1].x;
+                var from = track.getMinPosition();
+                var to = track.getMaxPosition();
                 this.drawTrack(track, ctx, from, to);
             }
         };
