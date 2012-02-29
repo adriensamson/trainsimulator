@@ -90,6 +90,7 @@ var TrainSimulator = {};
         var sorted = true;
         
         this.addElement = function (elm, fromPosition) {
+            sorted = false;
             var toPosition = elm.getPosition(),
                 i = 0;
             while (i < elements.length &&

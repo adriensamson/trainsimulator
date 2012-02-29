@@ -154,7 +154,7 @@
                         this.elementHead.getPosition());
             } else {
                 this.elementSignal.putOnTrack(this.elementTail.getTrack(),
-                        this.elementTail.getPosition() + forwardView * this.elementTail.getDirection() - this.direction * this.speed * tickDelta,
+                        this.elementTail.getPosition() + forwardView * this.elementTail.getDirection() + this.direction * this.speed * tickDelta,
                         this.elementTail.getDirection(),
                         this.elementTail.getPosition());
             }
