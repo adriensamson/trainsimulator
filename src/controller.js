@@ -89,6 +89,9 @@
     		return undefined;
     	};
     	
+    	this.getAvailablePositions = function () {
+    	    return this.positions;
+    	};
     };
     
     ts.Controller = function (element) {
@@ -100,22 +103,19 @@
     	var trainUl = document.createElement('ul');
     	element.appendChild(trainUl);
     	this.trains = {};
+    	var actions = [];
     	
     	this.addSwitch = function (name, sw) {
     		this.switches['name'] = sw;
     		var swLi = document.createElement('li');
     		swLi.setAttribute('class', 'switch');
     		swUl.appendChild(swLi);
-    		var input = document.createElement('input');
+    		var input = document.createElement('button');
     		input.id = 'controller-sw-' + name;
-    		input.type = 'checkbox';
-    		input.checked = sw.sw;
-    		input.sw = sw;
-    		var label = document.createElement('label');
-    		label.setAttribute('for', 'controller-sw-' + name);
-    		label.innerHTML = name;
+    		input.type = 'button';
+    		input.onclick = function () {actions.push(function(){sw.toggle();});};
+    		input.innerHTML = 'Toggle';
     		swLi.appendChild(input);
-    		swLi.appendChild(label);
     	};
     	
     	this.addSwitches = function (switches) {
@@ -135,17 +135,14 @@
     		swLi.innerHTML = name + '<br />';
     		
     		function addOption(option) {
-	    		var radio = document.createElement('input');
-	    		radio.type = 'radio';
-				radio.value = option;
-				radio.name = 'controller-swgroup-' + name;
-				radio.id = 'controller-swgroup-' + name + '-' + option;
-				radio.switchGroup = group;
-				var label = document.createElement('label');
-				label.setAttribute('for', 'controller-swgroup-' + name + '-' + option);
-				label.innerHTML = option;
-				swLi.appendChild(radio);
-				swLi.appendChild(label);
+	    		var button = document.createElement('button');
+	    		button.type = 'button';
+	    		button.value = option;
+	    		button.name = 'controller-swgroup-' + name;
+	    		button.id = 'controller-swgroup-' + name + '-' + option;
+	    		button.onclick = function () {actions.push(function() {group.setPosition(option);});};
+				button.innerHTML = option;
+				swLi.appendChild(button);
     		}
     		
     		for (var posname in group.positions) {
@@ -162,69 +159,70 @@
     		trainLi.innerHTML = name + '<br />';
     		
     		function addOption(option) {
-	    		var radio = document.createElement('input');
-	    		radio.type = 'radio';
-				radio.value = option;
-				radio.name = 'controller-train-' + name;
-				radio.id = 'controller-train-' + name + '-' + option;
-				radio.train = train;
-				var label = document.createElement('label');
-				label.setAttribute('for', 'controller-train-' + name + '-' + option);
-				label.innerHTML = option;
-				trainLi.appendChild(radio);
-				trainLi.appendChild(label);
-    		}
+                var button = document.createElement('button');
+                button.type = 'button';
+                button.value = option;
+                button.name = 'controller-train-' + name;
+                button.id = 'controller-train-' + name + '-' + option;
+                button.onclick = function () {actions.push(function() {train.order = option;});};
+                button.innerHTML = option;
+                trainLi.appendChild(button);
+            }
     		addOption('go');
     		addOption('stop');
     		addOption('reverse');
     		addOption('wait');
-    		var selected = trainLi.querySelector('input[value="'+train.order+'"]');
-    		if (selected) {
-				selected.checked = true;
-    		}
     	};
     	
     	this.tickInput = function () {
-    		var inputs = swUl.querySelectorAll('li.switch input');
     		var i;
-    		for (i = 0; i < inputs.length; i++) {
-    			if (inputs[i].checked ^ inputs[i].sw.sw) {
-    				inputs[i].sw.toggle();
-    			}
+    		for  (i = 0; i < actions.length; i++) {
+    		    actions[i]();
     		}
-    		var groups = swUl.querySelectorAll('li.switch-group input:checked');
-    		for (i= 0; i < groups.length; i++) {
-    			groups[i].switchGroup.setPosition(groups[i].value);
-    		}
-    		
-    		var trains = trainUl.querySelectorAll('input:checked');
-    		for (i= 0; i < trains.length; i++) {
-    			trains[i].train.order = trains[i].value;
-    		}
+    		actions = [];
     	};
     	
     	this.tickOutput = function () {
-    		var inputs = swUl.querySelectorAll('li.switch input');
-    		var i;
+    		var inputs = swUl.querySelectorAll('li.switch button');
+    		var i, j;
+    		var el, positions;
     		for (i = 0; i < inputs.length; i++) {
-    			inputs[i].checked = inputs[i].sw.sw;
+    			inputs[i].setAttribute('class', inputs[i].sw.sw ? 'on' : 'off');
     		}
     		for (i in this.switchGroups) {
     			if (this.switchGroups.hasOwnProperty(i)) {
-    				var el = document.getElementById('controller-swgroup-' + i + '-' + this.switchGroups[i].getPosition());
+    			    positions = this.switchGroups[i].getAvailablePositions();
+    			    for (j in positions) {
+    			        if (positions.hasOwnProperty(j)) {
+        			        el = document.getElementById('controller-swgroup-' + i + '-' + j);
+                            if (el) {
+                                el.setAttribute('class', '');
+                            }
+    			        }
+    			    }
+    				el = document.getElementById('controller-swgroup-' + i + '-' + this.switchGroups[i].getPosition());
     				if (el) {
-    					el.checked = true;
+    					el.setAttribute('class', 'on');
     				}
     			}
     		}
+    		positions = ['go', 'stop', 'reverse', 'wait'];
     		for (i in this.trains) {
-    			if (this.trains.hasOwnProperty(i)) {
-    				var el = document.getElementById('controller-train-' + i + '-' + this.trains[i].order);
-    				if (el) {
-    					el.checked = true;
-    				}
-    			}
-    		}
+                if (this.trains.hasOwnProperty(i)) {
+                    for (j = 0; j < positions.length; j++) {
+                        if (positions.hasOwnProperty(j)) {
+                            el = document.getElementById('controller-train-' + i + '-' + positions[j]);
+                            if (el) {
+                                el.setAttribute('class', '');
+                            }
+                        }
+                    }
+                    el = document.getElementById('controller-train-' + i + '-' + this.trains[i].order);
+                    if (el) {
+                        el.setAttribute('class', 'on');
+                    }
+                }
+            }
     	};
     };
 

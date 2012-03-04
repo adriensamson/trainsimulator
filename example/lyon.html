@@ -10,6 +10,7 @@
         <script type="text/javascript" src="../src/controller.js"></script>
         <style type="text/css">
 #controller, #controller ul {display: inline-block; vertical-align: top;}
+.on {color: Lime;}
         </style>
     </head>
     <body>
@@ -660,6 +661,7 @@ function addReturnSwitchGroup(swname) {
 	swGroup.addSignal(swname+'-2-0', 1, 0, 2); swGroup.addBlockEntry(1, 0, 1, 2);
 	swGroup.addPosition('||', [false, false], [true, true, true, true]);
 	swGroup.addPosition('S', [true, true], [false, false, true, true]);
+	swGroup.setPosition('||');
 	controller.addSwitchGroup(swname, swGroup);
 	ticker.registerInputTickable(swGroup);
 }
@@ -675,6 +677,7 @@ function addTurnSwitchGroup(swname) {
 	swGroup.addSignal(swname+'-2-0', 1, 0, 2); swGroup.addBlockEntry(1, 0, 1, 2);
 	swGroup.addPosition('||', [false, false], [true, false, true, false, true, true]);
 	swGroup.addPosition('//', [true, true], [false, true, false, true, true, true]);
+	swGroup.setPosition('||');
 	controller.addSwitchGroup(swname, swGroup);
 	ticker.registerInputTickable(swGroup);
 }
@@ -691,6 +694,7 @@ function addTiroir22SwitchGroup(swname) {
 	swGroup.addPosition('||', [false, false, null], [true, true, false, true, true]);
 	swGroup.addPosition('1', [true, false, false], [false, true, true, true, true]);
 	swGroup.addPosition('2', [false, true, true], [true, false, true, true, true]);
+	swGroup.setPosition('||');
 	controller.addSwitchGroup(swname, swGroup);
 	ticker.registerInputTickable(swGroup);
 }
@@ -707,6 +711,7 @@ function addTiroir12SwitchGroup(swname) {
     swGroup.addPosition('||', [true, false, null], [true, true, false, true, true]);
     swGroup.addPosition('1', [false, false, false], [false, true, true, true, true]);
     swGroup.addPosition('2', [true, true, true], [true, false, true, true, true]);
+    swGroup.setPosition('||');
     controller.addSwitchGroup(swname, swGroup);
     ticker.registerInputTickable(swGroup);
 }
@@ -723,6 +728,7 @@ function addEscapeSwitchGroup(swname) {
     swGroup.addPosition('||', [false, false, false], [true, true, true, false, true]);
     swGroup.addPosition('|/', [false, false, true], [true, true, false, true, true]);
     swGroup.addPosition('//', [true, true, true], [false, false, false, true, true]);
+    swGroup.setPosition('||');
     controller.addSwitchGroup(swname, swGroup);
     ticker.registerInputTickable(swGroup);
 }
@@ -758,6 +764,7 @@ t2t4.addSignal('t2t4', 0, 0, 3); t2t4.addBlockEntry(0, 0, 2, 3);
 t2t4.addSignal('t4t2', 1, 0, 3); t2t4.addBlockEntry(1, 0, 2, 3);
 t2t4.addPosition('off', [false, false], [true, true, true, true]);
 t2t4.addPosition('on', [true, true], [false, false, true, true]);
+t2t4.setPosition('off');
 controller.addSwitchGroup('t2t4', t2t4);
 ticker.registerInputTickable(t2t4);
 
