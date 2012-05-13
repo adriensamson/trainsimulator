@@ -94,19 +94,20 @@ var TrainSimulator = {};
             var toPosition = elm.getPosition(),
                 i = 0;
             while (i < elements.length &&
-                    elements[i].getPosition() < fromPosition) {
+                    (elements[i].insertedPosition < fromPosition ||
+                        elements[i].insertedPosition === fromPosition &&
+                        elements[i].insertedPosition === elements[i].element.getPosition() &&
+                        toPosition > fromPosition)
+            ) {
                 i++;
             }
-            if (i < elements.length && elements[i].getPosition() === fromPosition && toPosition > fromPosition) {
-                i++;
-            }
-            elements.splice(i, 0, elm);
+            elements.splice(i, 0, {insertedPosition: fromPosition, element: elm});
         };
         this.notifyMove = function () {
             sorted = false;
         };
         this.removeElement = function (elm) {
-            elements.splice(elements.indexOf(elm), 1);
+            elements = elements.filter(function (e) {return e.element !== elm;});
         };
         this.sortElements = function () {
             if (sorted) {
@@ -116,7 +117,7 @@ var TrainSimulator = {};
             var alreadySorted = true;
             var i, first, second;
             for (i = 0; i < elements.length - 1; i++) {
-                if (elements[i].getPosition() > elements[i+1].getPosition()) {
+                if (elements[i].element.getPosition() > elements[i+1].element.getPosition()) {
                     sorted = false;
                     // swap
                     first = elements[i];
@@ -124,9 +125,13 @@ var TrainSimulator = {};
                     elements[i] = second;
                     elements[i+1] = first;
                     // notify
-                    first.swaped(second);
-                    second.swaped(first);
+                    first.element.swaped(second.element);
+                    second.element.swaped(first.element);
                 }
+                elements[i].insertedPosition = elements[i].element.getPosition();
+            }
+            if (elements.length !== 0 && elements[i]) {
+                elements[i].insertedPosition = elements[i].element.getPosition();
             }
             if (!sorted) {
                 alreadySorted = false;
@@ -135,15 +140,19 @@ var TrainSimulator = {};
             return alreadySorted;
         };
         this.getMinPosition = function () {
-            if (elements.length > 0) {
-                return elements[0].getPosition();
+            if (elements.length === 1) {
+                return elements[0].element.getPosition();
+            } else if (elements.length > 0) {
+                return elements.reduce(function(lastValue, elm2) {return Math.min(lastValue, elm2.element.getPosition());}, Infinity);
             } else {
                 return 0;
             }
         };
         this.getMaxPosition = function () {
-            if (elements.length > 0) {
-                return elements[elements.length - 1].getPosition();
+            if (elements.length === 1) {
+                return elements[0].element.getPosition();
+            } else if (elements.length > 0) {
+                return elements.reduce(function(lastValue, elm2) {return Math.max(lastValue, elm2.element.getPosition());}, -Infinity);
             } else {
                 return 0;
             }

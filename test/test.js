@@ -22,9 +22,9 @@ var test = (function () {
         }
     }
     
-    test.assertEquals = function (val1, val2) {
+    test.assertEquals = function (val1, val2, e) {
         if (val1 !== val2) {
-            throw 'Failed asserting that '+val1+' is '+val2;
+            throw e || 'Failed asserting that '+val1+' is '+val2;
         }
     };
     test.assertTrue = function (val) {test.assertEquals(val, true);};
