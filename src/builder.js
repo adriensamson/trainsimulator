@@ -10,10 +10,11 @@
                 
         this.addStraightPiece = function (piece, currentPoint) {
             var newTrack = new ts.Track();
+            newTrack.type = 'straight';
             this.tracks.push(newTrack);
             newTrack.origin = {x: currentPoint.x, y: currentPoint.y};
             newTrack.angle = currentPoint.angle;
-            
+            newTrack.length = piece.length;
             currentPoint.x += piece.length * Math.cos(currentPoint.angle);
             currentPoint.y += piece.length * Math.sin(currentPoint.angle);
             if (piece.color !== undefined) {
@@ -27,8 +28,10 @@
             var endAngle, futureCurrentAngle, newTrack;
             newTrack = new ts.Track();
             this.tracks.push(newTrack);
+            newTrack.type = 'curve';
             newTrack.origin = {x: currentPoint.x, y: currentPoint.y};
             newTrack.radius = piece.radius;
+            newTrack.length = piece.length;
             newTrack.antiClockWise = !piece.clockWise;
             if (piece.clockWise) {
                 newTrack.center = {
@@ -57,6 +60,44 @@
             return newTrack;
         };
         
+        this.addQuadraticPiece = function (piece, currentPoint) {
+            var newTrack = new ts.Track();
+            this.tracks.push(newTrack);
+            newTrack.type = 'quadratic';
+            newTrack.origin = {x: currentPoint.x, y: currentPoint.y};
+            newTrack.end = {x:currentPoint.x + piece.offsetX * Math.cos(currentPoint.angle) - piece.offsetY * Math.sin(currentPoint.angle),
+                    y: currentPoint.y + piece.offsetX * Math.sin(currentPoint.angle) + piece.offsetY * Math.cos(currentPoint.angle)
+            };
+            newTrack.control = {x:currentPoint.x + (piece.offsetX - piece.offsetY*Math.tan(Math.PI/2-piece.offsetAngle)) * Math.cos(currentPoint.angle),
+                    y: currentPoint.y + (piece.offsetX - piece.offsetY*Math.tan(Math.PI/2-piece.offsetAngle)) * Math.sin(currentPoint.angle)
+            };
+            newTrack.points = [];
+            
+            var i, nbPoints = 20;
+            for (i = 0; i <= nbPoints; i++) {
+                var t = i / nbPoints;
+                newTrack.points[i] = {
+                    x: newTrack.origin.x * (1 - t) * (1 - t) + 2 * t * (1 - t) * newTrack.control.x + t * t * newTrack.end.x,
+                    y: newTrack.origin.y * (1 - t) * (1 - t) + 2 * t * (1 - t) * newTrack.control.y + t * t * newTrack.end.y
+                };
+                if (i > 0) {
+                    newTrack.points[i].length = newTrack.points[i-1].length + Math.sqrt(Math.pow(newTrack.points[i].x - newTrack.points[i-1].x, 2) + Math.pow(newTrack.points[i].y - newTrack.points[i-1].y, 2));
+                } else {
+                    newTrack.points[0].length = 0;
+                }
+            }
+            newTrack.length = newTrack.points[nbPoints].length;
+            currentPoint.x = newTrack.end.x;
+            currentPoint.y = newTrack.end.y;
+            currentPoint.angle = currentPoint.angle + piece.offsetAngle;
+            
+            if (piece.color !== undefined) {
+                newTrack.color = piece.color;
+            }
+            this.addTrackPiecePoints(piece, newTrack, currentPoint);
+            return newTrack;
+        };
+        
         this.addTrackPiecePoints = function (piece, track, currentPoint) {
             if (piece.startPoint !== undefined) {
                 var inversedPoint = {
@@ -76,7 +117,7 @@
                 this.addPoint(piece.endPoint, {
                     type: 'track',
                     track: track,
-                    position: piece.length,
+                    position: track.length,
                     direction: 1,
                     currentPoint: ts.Utils.clone(currentPoint)
                 });
@@ -155,6 +196,11 @@
                         currentPoint = ts.Utils.clone(this.points[piece.startPoint][0].currentPoint);
                     }
                     newTrack = this.addCurvePiece(piece, currentPoint);
+                } else if (piece.type === 'quadratic') {
+                    if (piece.startPoint !== undefined) {
+                        currentPoint = ts.Utils.clone(this.points[piece.startPoint][0].currentPoint);
+                    }
+                    newTrack = this.addQuadraticPiece(piece, currentPoint);
                 } else if (piece.type === 'switch') {
                     if (this.points[piece.point0] !== undefined) {
                         currentPoint = ts.Utils.clone(this.points[piece.point0][0].currentPoint);
@@ -173,7 +219,7 @@
                     schema.pieces[i-1].endPoint === undefined && piece.startPoint === undefined
                 ) {
                     joint = new ts.Joint();
-                    joint.connectTrack(0, lastTrack, schema.pieces[i-1].length, 1);
+                    joint.connectTrack(0, lastTrack, lastTrack.length, 1);
                     joint.connectTrack(1, newTrack, 0, -1);
                 }
                 lastTrack = newTrack;

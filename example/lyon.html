@@ -534,7 +534,8 @@ var schema = {
         TramPieces.curveLeft(),
         TramPieces.curveLeft(),
         TramPieces.straightSpacing(),
-        TramPieces.station({name: 'st-perrache-1', endPoint: 'perrache1'}),
+        TramPieces.station({name: 'st-perrache-1'}),
+        TramPieces.straightL1({endPoint: 'perrache1'}),
         
         TramPieces.straightL1({startPoint: 'origin2'}),
         TramPieces.straightSpacing(),
@@ -546,7 +547,8 @@ var schema = {
         TramPieces.curveLeft(),
         TramPieces.curveLeft(),
         TramPieces.curveLeft(),
-        TramPieces.station({name: 'st-perrache-2', endPoint: 'perrache2'}),
+        TramPieces.station({name: 'st-perrache-2'}),
+        TramPieces.straightL1({endPoint: 'perrache2'}),
         
         TramPieces.switchLeft0('sw-perrache-1', 'perrache1', 'sw-perrache-1.1', 'sw-perrache-1.2'),
         TramPieces.switchLeft2('sw-perrache-2', 'sw-perrache-2.0', 'perrache2', 'sw-perrache-1.2'),
@@ -860,7 +862,7 @@ addT1('st-universite-1', 45, 1);
 addT1('st-bernard-1', 45, 1);
 addT1('st-perrache-1', 5, -1);
 
-addT2('perrache-T2', 10, 1);
+addT2('perrache-T2', 5, -1);
 addT2('st-berthelot-2', 5, -1);
 addT2('st-jean-mace-2', 5, -1);
 addT2('st-garibaldi-2', 5, -1);

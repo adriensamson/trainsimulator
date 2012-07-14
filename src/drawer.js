@@ -58,13 +58,32 @@
         };
         
         this.drawTrack = function (track, ctx, from, to) {
-            if (track.center) {
+            if (track.type === 'curve') {
                 var drawAntiClockWise = (from < to ) ? track.antiClockWise : !track.antiClockWise;
                 var drawOriginAngle = track.originAngle + ((track.antiClockWise) ? -1 : 1) * from / track.radius;
                 var drawEndAngle = track.originAngle + ((track.antiClockWise) ? -1 : 1) * to / track.radius;
                 ctx.beginPath();
                 ctx.arc(track.center.x, track.center.y, track.radius, drawOriginAngle, drawEndAngle, drawAntiClockWise);
                 ctx.stroke();
+            } else if (track.type === 'quadratic') {
+                if (from === 0 && to === track.length || to === 0 && from === track.length) {
+                    ctx.beginPath();
+                    ctx.moveTo(track.origin.x, track.origin.y);
+                    ctx.quadraticCurveTo(track.control.x, track.control.y, track.end.x, track.end.y);
+                    ctx.stroke();
+                } else {
+                    var i = 0, min = Math.min(from, to), max = Math.max(from, to);
+                    while (i < track.points.length && track.points[i].length < min) {
+                        i++;
+                    }
+                    ctx.beginPath();
+                    ctx.moveTo(track.points[i].x, track.points[i].y);
+                    while (i < track.points.length && track.points[i].length <= max) {
+                        ctx.lineTo(track.points[i].x, track.points[i].y);
+                        i++;
+                    }
+                    ctx.stroke();
+                }
             } else {
                 ctx.beginPath();
                 ctx.moveTo(track.origin.x + from * Math.cos(track.angle), track.origin.y + from * Math.sin(track.angle));
