@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Train simulator</title>
+        <script type="text/javascript" src="../src/trainsimulator.js"></script>
+        <script type="text/javascript" src="../src/drawer.js"></script>
+        <script type="text/javascript" src="../src/builder.js"></script>
+        <script type="text/javascript" src="quad.js"></script>
+        <script type="text/javascript" src="../src/automatic.js"></script>
+    </head>
+    <body>
+        <h1>Train simulator TEST</h1>
+        <canvas id="canvas" width="800" height="800"></canvas><br />
+        <script type="text/javascript">
+var schema = {
+    points: {
+        'origin1': {x: 0, y: 0, angle: 0},
+        'origin2': {x: 0, y: 3, angle: 0}
+    },
+    'pieces': [].concat(
+        
+        QuadPieces.jointTrack({startPoint: 'origin1'}),
+        QuadPieces.straightA0(3),
+        QuadPieces.straightSpacing(0, 1, {endPoint: 'sw1.1|0'}),
+        QuadPieces.jointTrack({startPoint: 'origin2'}),
+        QuadPieces.straightA0(3, {endPoint: 'sw1.2|0'}),
+        QuadPieces.sw('sw1.1'),
+        QuadPieces.sw('sw1.2'),
+        
+        QuadPieces.straightA0(3, {startPoint: 'sw1.1|1'}),
+        QuadPieces.straightUnSpacing(0, 1, {endPoint: 'sw1.3|1'}),
+        QuadPieces.straightA0(4, {startPoint: 'sw1.2|1'}),
+        QuadPieces.straightSpacing(0, 1, {endPoint: 'sw1.4|1'}),
+        QuadPieces.sw('sw1.3'),
+        QuadPieces.sw('sw1.4'),
+        
+        QuadPieces.curve(0, 4, {startPoint: 'sw1.1|2'}),
+        QuadPieces.straightSpacing(0, 1, {endPoint: 'sw1.6|1'}),
+        QuadPieces.curve(0, 4, {startPoint: 'sw1.2|2', endPoint: 'sw1.5|1'}),
+        QuadPieces.sw('sw1.5'),
+        QuadPieces.sw('sw1.6'),
+        
+        QuadPieces.straightSpacing(0, 1, {startPoint: 'sw1.5|2'}),
+        QuadPieces.curve(-4, 0, {endPoint: 'sw1.3|2'}),
+        QuadPieces.curve(-4, 0, {startPoint: 'sw1.6|2', endPoint: 'sw1.4|2'}),
+        
+        QuadPieces.straightA0(3, {startPoint:'sw1.3|0'}),
+        QuadPieces.jointTrack(),
+        QuadPieces.straightUnSpacing(0, 1,  {startPoint:'sw1.4|0'}),
+        QuadPieces.straightA0(2),
+        QuadPieces.jointTrack(),
+        QuadPieces.straightUnSpacing(0, 1,  {startPoint:'sw1.5|0'}),
+        QuadPieces.straightA0(2),
+        QuadPieces.jointTrack(),
+        QuadPieces.straightUnSpacing(0, 1,  {startPoint:'sw1.6|0'}),
+        QuadPieces.straightA0(2),
+        QuadPieces.jointTrack(),
+        []
+    )
+};
+var builder = new TrainSimulator.TrainSimulatorBuilder();
+var drawer = new TrainSimulator.CanvasDrawer(document.getElementById('canvas'));
+var trainSimulator = new TrainSimulator.TrainSimulator();
+var ticker = new TrainSimulator.Ticker();
+ticker.tickDelta = 0.1;
+ticker.registerResolveTickable(trainSimulator);
+ticker.registerOutputTickable(drawer);
+
+builder.build(schema);
+builder.registerToTrainSimulator(trainSimulator);
+builder.registerToDrawer(drawer);
+drawer.scale = 1;
+drawer.trackWidth = 1.435;
+drawer.switchLength = 9;
+drawer.gridInfo = {
+    minX: 0,
+    maxX: 500,
+    minY: 0,
+    maxY: 500,
+    spacing: 15
+};
+drawer.doGridDrawing = true;
+
+ticker.run();
+        </script>
+    </body>
+</html>
+
