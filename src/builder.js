@@ -7,7 +7,23 @@
         this.switches = [];
         this.namedTracks = {};
         this.namedSwitches = {};
-                
+        
+        this.addGotoPiece = function (piece, currentPoint) {
+            var newTrack = new ts.Track();
+            newTrack.type = 'goto';
+            this.tracks.push(newTrack);
+            newTrack.origin = {x: currentPoint.x, y: currentPoint.y};
+            newTrack.end = {x: piece.x, y: piece.y};
+            newTrack.length = Math.sqrt(Math.pow(piece.x - currentPoint.x, 2) + Math.pow(piece.y - currentPoint.y, 2));
+            currentPoint.x = piece.x;
+            currentPoint.y = piece.y;
+            if (piece.color !== undefined) {
+                newTrack.color = piece.color;
+            }
+            this.addTrackPiecePoints(piece, newTrack, currentPoint);
+            return newTrack;
+        },
+        
         this.addStraightPiece = function (piece, currentPoint) {
             var newTrack = new ts.Track();
             newTrack.type = 'straight';
@@ -186,7 +202,12 @@
             for (i = 0; i < schema.pieces.length; i++) {
                 newTrack = undefined;
                 piece = schema.pieces[i];
-                if (piece.type === 'straight') {
+                if (piece.type === 'goto') {
+                    if (piece.startPoint !== undefined) {
+                        currentPoint = ts.Utils.clone(this.points[piece.startPoint][0].currentPoint);
+                    }
+                    newTrack = this.addGotoPiece(piece, currentPoint);
+                } else if (piece.type === 'straight') {
                     if (piece.startPoint !== undefined) {
                         currentPoint = ts.Utils.clone(this.points[piece.startPoint][0].currentPoint);
                     }

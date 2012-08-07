@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Train simulator</title>
+        <script type="text/javascript" src="../src/trainsimulator.js"></script>
+        <script type="text/javascript" src="../src/drawer.js"></script>
+        <script type="text/javascript" src="../src/builder.js"></script>
+        <script type="text/javascript" src="../src/tram.js"></script>
+        <script type="text/javascript" src="../src/automatic.js"></script>
+        <script type="text/javascript" src="../src/controller.js"></script>
+        <style type="text/css">
+#controller, #controller ul {display: inline-block; vertical-align: top;}
+.on {color: Lime;}
+        </style>
+    </head>
+    <body>
+        <h1>Train simulator TEST</h1>
+        <canvas id="canvas" width="800" height="500" style="border: 1px dotted #ccc"></canvas>
+        <div id="controller"></div>
+        <br />
+        <script type="text/javascript">
+function gpsX(x) {return (x - 4.835091)* 111110}
+function gpsY(y) {return (y - 45.747463)* -111110}
+function sw(name) {return {type: 'switch', name:name, point0: name+'.0', point1: name+'.1', point2: name+'.2',}}
+var originAngle = Math.PI / 8;
+var colorStation = {r:0, g:255, b:0};
+var schema = {
+    points: {
+        origin1: {x: gpsX(4.833468), y: gpsY(45.747984), angle: originAngle},
+        origin2: {x: gpsX(4.833488), y: gpsY(45.747945), angle: originAngle}
+    },
+    pieces: [].concat(
+        {type: 'goto', x: gpsX(4.835091), y: gpsY(45.747463), startPoint: 'origin1', endPoint: 'sw-berthelot-1.0'},
+        {type: 'goto', x: gpsX(4.835362), y: gpsY(45.747346), startPoint: 'origin2', endPoint: 'sw-berthelot-2.1'},
+        sw('sw-berthelot-1'), sw('sw-berthelot-2'),
+        {type: 'goto', x: gpsX(4.835362), y: gpsY(45.747346), startPoint: 'sw-berthelot-1.2', endPoint: 'sw-berthelot-2.2'},
+        
+        {type: 'goto', x: gpsX(4.836171), y: gpsY(45.747116), startPoint: 'sw-berthelot-1.1'},
+        {type: 'goto', x: gpsX(4.836526), y: gpsY(45.747002), name: 'st-berthelot-1', color: colorStation},
+        {type: 'goto', x: gpsX(4.842097), y: gpsY(45.745225)},
+        {type: 'goto', x: gpsX(4.842482), y: gpsY(45.745107), name: 'st-jeanmace-1', color: colorStation},
+        {type: 'goto', x: gpsX(4.846721), y: gpsY(45.743745)},
+        {type: 'goto', x: gpsX(4.847076), y: gpsY(45.743634), name: 'st-garibaldi-1', color: colorStation},
+        {type: 'goto', x: gpsX(4.851522), y: gpsY(45.742218)},
+        {type: 'goto', x: gpsX(4.851876), y: gpsY(45.742109), name: 'st-rtevienne-1', color: colorStation},
+        {type: 'goto', x: gpsX(4.858574), y: gpsY(45.739960)},
+        {type: 'goto', x: gpsX(4.858929), y: gpsY(45.739845), name: 'st-jetdeau-1', color: colorStation},
+        {type: 'goto', x: gpsX(4.863160), y: gpsY(45.738493)},
+        {type: 'goto', x: gpsX(4.863518), y: gpsY(45.738375), name: 'st-villon-1', color: colorStation},
+        {type: 'goto', x: gpsX(4.868046), y: gpsY(45.736925)},
+        {type: 'goto', x: gpsX(4.868401), y: gpsY(45.736810), name: 'st-bachut-1', color: colorStation},
+        
+        {type: 'goto', x: gpsX(4.836157), y: gpsY(45.747091), startPoint: 'sw-berthelot-2.0'},
+        {type: 'goto', x: gpsX(4.836504), y: gpsY(45.746981), name: 'st-berthelot-2', color: colorStation},
+        {type: 'goto', x: gpsX(4.842087), y: gpsY(45.745202)},
+        {type: 'goto', x: gpsX(4.842468), y: gpsY(45.745084), name: 'st-jeanmace-2', color: colorStation},
+        {type: 'goto', x: gpsX(4.846697), y: gpsY(45.743726)},
+        {type: 'goto', x: gpsX(4.847057), y: gpsY(45.743610), name: 'st-garibaldi-2', color: colorStation},
+        {type: 'goto', x: gpsX(4.851505), y: gpsY(45.742192)},
+        {type: 'goto', x: gpsX(4.851859), y: gpsY(45.742080), name: 'st-rtevienne-2', color: colorStation},
+        {type: 'goto', x: gpsX(4.858555), y: gpsY(45.739930)},
+        {type: 'goto', x: gpsX(4.858912), y: gpsY(45.739815), name: 'st-jetdeau-2', color: colorStation},
+        {type: 'goto', x: gpsX(4.863140), y: gpsY(45.738468)},
+        {type: 'goto', x: gpsX(4.863499), y: gpsY(45.738351), name: 'st-villon-2', color: colorStation},
+        {type: 'goto', x: gpsX(4.868030), y: gpsY(45.736897)},
+        {type: 'goto', x: gpsX(4.868382), y: gpsY(45.736786), name: 'st-bachut-2', color: colorStation},
+        //{type: 'goto', x: gpsX(), y: gpsY()},
+        //{type: 'goto', x: gpsX(), y: gpsY(), name: 'st-', color: colorStation},
+        
+
+        []
+    )
+};
+var builder = new TrainSimulator.TrainSimulatorBuilder();
+var drawer = new TrainSimulator.CanvasDrawer(document.getElementById('canvas'));
+var trainSimulator = new TrainSimulator.TrainSimulator();
+var controller = new TrainSimulator.Controller(document.getElementById('controller'));
+var ticker = new TrainSimulator.Ticker();
+ticker.tickDelta = 0.1;
+ticker.registerResolveTickable(trainSimulator);
+ticker.registerOutputTickable(drawer);
+ticker.registerInputTickable(controller.tickInput.bind(controller));
+ticker.registerOutputTickable(controller.tickOutput.bind(controller));
+
+builder.build(schema);
+builder.registerToTrainSimulator(trainSimulator);
+builder.registerToDrawer(drawer);
+drawer.scale = 1;
+drawer.trackWidth = 1.435;
+drawer.switchLength = 9;
+
+
+ticker.run();
+
+        </script>
+        
+    </body>
+</html>
+

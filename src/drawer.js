@@ -84,10 +84,15 @@
                     }
                     ctx.stroke();
                 }
-            } else {
+            } else if (track.type === 'straight') {
                 ctx.beginPath();
                 ctx.moveTo(track.origin.x + from * Math.cos(track.angle), track.origin.y + from * Math.sin(track.angle));
                 ctx.lineTo(track.origin.x + to * Math.cos(track.angle), track.origin.y + to * Math.sin(track.angle));
+                ctx.stroke();
+            } else if (track.type === 'goto') {
+                ctx.beginPath();
+                ctx.moveTo(track.origin.x /*+ from * Math.cos(track.angle)*/, track.origin.y /*+ from * Math.sin(track.angle)*/);
+                ctx.lineTo(track.end.x /*+ to * Math.cos(track.angle)*/, track.end.y /*+ to * Math.sin(track.angle)*/);
                 ctx.stroke();
             }
         };
