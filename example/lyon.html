@@ -215,11 +215,11 @@ var schema = {
         TramPieces.switchLeft2('sw-lafayette-arr-1', 'sw-lafayette-arr-1.0', 'sw-lafayette-arr-1.1', 'sw-lafayette-arr-2.2'),
         
         TramPieces.straightL1({startPoint: 'sw-lafayette-arr-1.0'}),
-        TramPieces.straightL1({name: 'lafayette-1'}),
+        TramPieces.straightL2({name: 'lafayette-1'}),
         TramPieces.jointTrack(),
         
         TramPieces.straightL1({startPoint: 'sw-lafayette-arr-2.1'}),
-        TramPieces.straightL1({name: 'lafayette-2'}),
+        TramPieces.straightL2({name: 'lafayette-2'}),
         TramPieces.jointTrack(),
         
         /* T3 - T4 */
@@ -461,7 +461,7 @@ var schema = {
         TramPieces.switchRight2('sw-villon-2', 'sw-villon-2.0', 'sw-villon-2.1', 'sw-villon-1.2'),
         
         TramPieces.straightL1({startPoint: 'sw-villon-1.1'}),
-        TramPieces.straightL1(),
+        TramPieces.straightL2({name: 'villon-1'}),
         TramPieces.curveLeft(),
         TramPieces.curveLeft(),
         TramPieces.curveLeft(),
@@ -472,7 +472,7 @@ var schema = {
         TramPieces.straightL1({endPoint: 'sw-jean23-1-1.1'}),
         
         TramPieces.straightL1({startPoint: 'sw-villon-2.0'}),
-        TramPieces.straightL1(),
+        TramPieces.straightL2({name: 'villon-2'}),
         TramPieces.straightSpacing3(),
         TramPieces.curveLeft(),
         TramPieces.curveLeft(),
@@ -618,7 +618,7 @@ drawer.gridInfo = {
 	maxY: 1000,
 	spacing: 15
 };
-drawer.doGridDrawing = true;
+//drawer.doGridDrawing = true;
 
 var trackName;
 for (trackName in builder.namedTracks) {
@@ -646,14 +646,14 @@ revertElement(builder.namedTracks['charlemagne-2'], 10);
 revertElement(builder.namedTracks['perrache-T2'], 10);
 revertElement(builder.namedTracks['tiroir-jean23-1'], 15);
 revertElement(builder.namedTracks['tiroir-jean23-2'], 15);
-revertElement(builder.namedTracks['grangeblanche-1'], 1);
-revertElement(builder.namedTracks['grangeblanche-2'], 10);
+revertElement(builder.namedTracks['villon-1'], 25);
+revertElement(builder.namedTracks['villon-2'], 25);
 revertElement(builder.namedTracks['venissieux-1'], 15);
 revertElement(builder.namedTracks['venissieux-2'], 15);
 revertElement(builder.namedTracks['partdieu-1'], 15);
 revertElement(builder.namedTracks['partdieu-2'], 15);
-revertElement(builder.namedTracks['lafayette-1'], 15);
-revertElement(builder.namedTracks['lafayette-2'], 15);
+revertElement(builder.namedTracks['lafayette-1'], 25);
+revertElement(builder.namedTracks['lafayette-2'], 25);
 revertElement(builder.namedTracks['T3-1'], 10);
 revertElement(builder.namedTracks['T3-2'], 10);
 revertElement(builder.namedTracks['tiroir-vilette'], 15);
@@ -826,10 +826,8 @@ function addT2(trackName, position, direction) {
     train2.remotes = {
         'perrache-3-2': '|/',
         'gallieni-2-0': '||',
-        'jean23-2-2-1': '||',
-        'jean23-2-2-0': '2',
-        'jean23-2-3-0': '1',
-        'jean23-2-1-0': '||',
+        'villon-2-1': '||',
+        'villon-2-0': 'S',
         'gallieni-1-1': '||',
         'perrache-1-0': '//'
     };

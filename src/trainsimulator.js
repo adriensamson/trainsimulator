@@ -243,7 +243,7 @@ var TrainSimulator = {};
             var tailPosition = position - direction * size;
             this.elementHead = new ts.Element();
             this.elementHead.swaped = function (elm) {
-                if (train.isOnElm(elm)) {
+                if (this.getPosition() * this.getDirection() > elm.getPosition() * this.getDirection()) {
                     if (elm.upped) {
                         elm.upped(train);
                     }
@@ -267,7 +267,7 @@ var TrainSimulator = {};
 
             this.elementTail = new ts.Element();
             this.elementTail.swaped = function (elm) {
-               if (train.isOnElm(elm)) {
+               if (this.getPosition() * this.getDirection() > elm.getPosition() * this.getDirection()) {
                     if (elm.upped) {
                         elm.upped(train);
                     }
@@ -323,7 +323,7 @@ var TrainSimulator = {};
                 if (trackPart.track === elm.getTrack()) {
                     if (trackPart.from < elm.getPosition() && elm.getPosition() <= trackPart.to ||
                         trackPart.to < elm.getPosition() && elm.getPosition() <= trackPart.from ||
-                        i !== 0 && i !== trackParts.length - 1 && (trackPart.from === elm.getPosition() && trackPart.to === elm.getPosition())
+                        i !== 0 && i !== trackParts.length - 1 && (trackPart.from === elm.getPosition() || trackPart.to === elm.getPosition())
                     ) {
                         return true;
                     }
